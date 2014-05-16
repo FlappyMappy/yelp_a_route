@@ -1,0 +1,26 @@
+Simple user stories:
+As a traveler, I want to be able to enter several cities and find places nearby that route, so I can see where to stop as I travel.
+
+As a foodie, I want to find restaurants near my route, so I can find where to eat.
+
+As a road-tripper, I want to find places to stop within one mile of the highway, so I can find places to stop without driving too far out of the way.
+
+As a traveler, I want to be able to search routes on my mobile phone, so I can quickly find places even on a small screen.
+
+Kevin:
+
+As a route planner, I want to enter two locations and get a route, so I can see where I am going.
+
+As a route planner, I want to edit my route if I need to take a unusual path so I don't have to use the default route.
+
+As a picky eater, I want to be able to enter keywords and get restaurants that match.
+
+As a bad navigator, I want to be able to select a place and get a new route directly there.
+
+
+
+TL:DR: 
+-input several cities, output places nearby
+-filter output by type
+-filter output by distance
+-usable on smartphone/tablet
