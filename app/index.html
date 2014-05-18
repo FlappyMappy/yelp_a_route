@@ -20,7 +20,7 @@
 
     google.maps.event.addDomListener(window,'load',function() {
 
-      calcRoute(function(res){
+      calcRoute("seattle, wa", "lafayette, CA", function(res){
         console.log(polylineToBBox(res.routes[0].overview_path,10));
       });
       
