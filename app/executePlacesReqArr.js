@@ -9,7 +9,7 @@
 
 function executePlacesReqArr(reqArr, callback){
 	
-	(function makeReq(){
+	function makeReq(){
 
 		reqArr.shift()(callback);
 
@@ -18,5 +18,7 @@ function executePlacesReqArr(reqArr, callback){
 				makeReq();
 			},200);
 		};
-	})();
+	};
+
+	makeReq();
 };
