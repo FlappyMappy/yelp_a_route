@@ -7,24 +7,29 @@ function plot_places (placesJSON, map) {
 
   _.each(placesJSON, function (place) {
       
+    console.log(place);
+
     (function () {
+
+
 
       var newMarker = new google.maps.Marker({
         
         // for now, just get the name and location
         position: place.geometry.location,
         title: place.name,
-        map: map,
-        icon: place.icon
+        map: map
       });
 
       var newInfoWindow = new google.maps.InfoWindow({
         content: "<b>Name: </b>" + place.name
       });
 
-      console.log(place.name);
+      //make info window close when the next one is opened
+
 
       google.maps.event.addListener(newMarker, 'click', function() {
+        
         newInfoWindow.open(map,newMarker);
       });
 

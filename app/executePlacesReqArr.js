@@ -16,7 +16,7 @@ function executePlacesReqArr(reqArr, callback){
 		if(reqArr.length>0){
 			setTimeout(function(){
 				makeReq();
-			},200);
+			},300);
 		};
 	};
 
