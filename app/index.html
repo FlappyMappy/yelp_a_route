@@ -11,14 +11,17 @@
     </div>
 
     <div id = "map-canvas"></div>
-   
+     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src = "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization,places&key=AIzaSyA7tOZNjgHPNh5a-zL1Mo9EFIysbwUU4s4&sensor=false"></script>
     <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/routeboxer/src/RouteBoxer.js"></script>
     <script src = "polylineToBBox.js"></script>
     <script src = "bboxToPlacesReqArr.js"></script>
     <script src = "calcRoute.js"></script>
     <script src = "executePlacesReqArr.js"></script>
+    <script src = "parse_places_array.js"></script>
+    <script src = "plot_places.js"></script>
 
     <script>
 
@@ -37,11 +40,7 @@
 
         var placesReqArray = bboxToPlacesReqArr(bboxArray, {}, map);
 
-        executePlacesReqArr(placesReqArray, function(results, pagination){
-
-          console.log(results);
-
-        });
+        executePlacesReqArr(placesReqArray, parse_places_array);
 
       });
     });

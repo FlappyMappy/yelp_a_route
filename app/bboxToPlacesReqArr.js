@@ -30,7 +30,7 @@ function bboxToPlacesReqArr(bboxArray, options, map){
 					
 					if (status == google.maps.places.PlacesServiceStatus.OK){
 
-						callback(result, pagination);
+						callback(result, pagination, map);
 
 					} else {
 						throw("BBox to Places request failed");
