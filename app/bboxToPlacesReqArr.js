@@ -21,7 +21,10 @@ function bboxToPlacesReqArr(bboxArray, options, map){
 		
 		var req = (function() {
 			var reqOptions = {
-				bounds: bboxArray[i]
+				bounds: bboxArray[i],
+				types: ["food"],
+				keyword: "mexican"
+
 			};
 
 			return function(callback) {
