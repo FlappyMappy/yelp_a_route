@@ -1,7 +1,13 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World Express</title>
+    <title>Yelp a Route</title>
+      <style type="text/css">
+        html { height: 100% }
+        body { height: 100%; margin: 0; padding: 0; background-color: #4F4F4F}
+        #map-canvas { height: 500px }
+        header {}
+    </style>
   </head>
   <body>
     <div class="my_content">
@@ -9,9 +15,21 @@
       <h1>Hello World</h1>
     </p>
     </div>
-
+    <header>
+      <form type="POST" class="search">
+        <div class="searchBoxes">
+          Start: <input class="startSearchBox" required>
+          Destination <input class="destinationSearchBox" required>
+          <button>Search</button>
+        <div class="options">
+          Food <input type="checkbox" class="foodCheckbox" value="food">
+          Gas <input type="checkbox" class="gasCheckbox" value="gas_station">
+          Shopping <input type="checkbox" class="shoppingCheckbox" value="store">
+        </div>
+      </form>
+    </header>
     <div id = "map-canvas"></div>
-   
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization,places&key=AIzaSyA7tOZNjgHPNh5a-zL1Mo9EFIysbwUU4s4&sensor=false"></script>
     <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/routeboxer/src/RouteBoxer.js"></script>
@@ -31,18 +49,24 @@
 
       var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
 
-      calcRoute("seattle, wa", "tacoma, wa", function(res){
-        
-        var bboxArray = polylineToBBox(res.routes[0].overview_path,2);
+      $(".search").on("submit", function(event){
+        event.preventDefault();
+        console.log("in submit event");
+        console.log($(".startSearchBox").val());
+        console.log($(".destinationSearchBox").val());
 
-        var placesReqArray = bboxToPlacesReqArr(bboxArray, {}, map);
+        calcRoute($(".startSearchBox").val(), $(".destinationSearchBox").val(), function(res){
+          console.log("inside calcRoute");
+          var bboxArray = polylineToBBox(res.routes[0].overview_path,2);
 
-        executePlacesReqArr(placesReqArray, function(results, pagination){
+          var placesReqArray = bboxToPlacesReqArr(bboxArray, {}, map);
 
-          console.log(results);
+          executePlacesReqArr(placesReqArray, function(results, pagination){
 
+            console.log(results);
+
+          });
         });
-
       });
     });
 
