@@ -40,7 +40,7 @@
     </sidebar>
 
     <div id = "map-canvas"></div>
-
+-   <script src = "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization,places&key=AIzaSyA7tOZNjgHPNh5a-zL1Mo9EFIysbwUU4s4&sensor=false"></script>
     <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/routeboxer/src/RouteBoxer.js"></script>
@@ -48,14 +48,15 @@
     <script src = "bboxToPlacesReqArr.js"></script>
     <script src = "calcRoute.js"></script>
     <script src = "executePlacesReqArr.js"></script>
-
+-   <script src = "parse_places_array.js"></script>
+ -  <script src = "plot_places.js"></script>
     <script>
 
     google.maps.event.addDomListener(window,'load',function() {
 
       var mapOptions = {
-          center: new google.maps.LatLng(-34.397, 150.644),
-          zoom: 8
+-          center: new google.maps.LatLng( 39.8,-98.6),
+ -         zoom: 4
       };
 
       var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
@@ -92,17 +93,17 @@
         console.log("start box contains: " + $("#start").val());
         console.log("destination box contains: " + $("#destination").val());
 
-        // calcRoute($(".start-search-box").val(), $(".destination-search-box").val(), function(res){
-        //   var bboxArray = polylineToBBox(res.routes[0].overview_path, searchDistance);
+           calcRoute($(".start-search-box").val(), $(".destination-search-box").val(), function(res){
+           var bboxArray = polylineToBBox(res.routes[0].overview_path, searchDistance);
 
-        //   var placesReqArray = bboxToPlacesReqArr(bboxArray, {}, map);
+           var placesReqArray = bboxToPlacesReqArr(bboxArray, {}, map);
 
-        //   executePlacesReqArr(placesReqArray, function(results, pagination){
+           executePlacesReqArr(placesReqArray, function(results, pagination){
 
-        //     console.log(results);
+             console.log(results);
 
-        //   });
-        // });
+           });
+         });
       });
     });
 
