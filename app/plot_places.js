@@ -6,8 +6,6 @@ function plot_places (placesJSON, map) {
   var total_markers = 0;     // total markers in our array so far
 
   _.each(placesJSON, function (place) {
-      
-    console.log(place);
 
     (function () {
 
@@ -18,7 +16,14 @@ function plot_places (placesJSON, map) {
         // for now, just get the name and location
         position: place.geometry.location,
         title: place.name,
-        map: map
+        map: map,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 3,
+          strokeWeight: 1,
+          fillOpacity: 1,
+          fillColor: "red"
+        }
       });
 
       var newInfoWindow = new google.maps.InfoWindow({
