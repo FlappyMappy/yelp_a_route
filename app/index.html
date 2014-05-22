@@ -12,7 +12,7 @@
   <body>
     <div class="my-content">
     <p>
-      <h1>Hello World</h1>
+      <h1>Along the Way</h1>
     </p>
     </div>
     <header>
@@ -25,13 +25,13 @@
           Food <input type="checkbox" class="food-checkbox" value="food">
           Gas <input type="checkbox"  class="gas-checkbox" value="gas_station">
           Shopping <input type="checkbox" class="shopping-checkbox" value="store">
-          Distance <input list="distances" id="dist" />
-          <datalist id="distances"> <!--make this skinnier-->
-            <option value="1">
-            <option value="2" selected="selected">
-            <option value="5">
-            <option value="10">
-          </datalist>
+          Distance:
+          <select id="distances">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+          </select>
         </div>
       </form>
     </header>
@@ -64,7 +64,7 @@
         type: []
       };
 
-      //adds/removes types from the seach options object
+      //adds/removes types from the seach options object when boxes clicked
       $("input[type=checkbox]").on("change", function(){
         var option = $(this).val();
         if($(this).is(":checked")){
@@ -74,11 +74,6 @@
           searchOptions.type.splice(index,index+1);
         }
       });
-      //changes search distance from default //DOES NOT WORK YET////
-      $("#dist").on("change", function(){
-        searchDistance = $(this).val();
-        console.log(searchDistance);
-      })
 
       //empties search box when clicked
       $(".search-box").on("focus", function(){
@@ -89,20 +84,22 @@
       $(".search").on("submit", function(event){
         //preventDefault stops a new page from loading
         event.preventDefault();
-        console.log("start box contains: " + $("#start").val());
-        console.log("destination box contains: " + $("#destination").val());
+        searchDistance = $("#distances").val();
+        console.log("Search from: " + $("#start").val());
+        console.log("Search to: "   + $("#destination").val());
+        console.log("Distance to search from route " + searchDistance);
 
-        // calcRoute($(".start-search-box").val(), $(".destination-search-box").val(), function(res){
-        //   var bboxArray = polylineToBBox(res.routes[0].overview_path, searchDistance);
+        calcRoute($("#start").val(), $("#destination").val(), function(res){
+          var bboxArray = polylineToBBox(res.routes[0].overview_path, searchDistance);
 
-        //   var placesReqArray = bboxToPlacesReqArr(bboxArray, {}, map);
+          var placesReqArray = bboxToPlacesReqArr(bboxArray, searchOptions, map);
 
-        //   executePlacesReqArr(placesReqArray, function(results, pagination){
+          executePlacesReqArr(placesReqArray, function(results, pagination){
 
-        //     console.log(results);
+            console.log(results);
 
-        //   });
-        // });
+          });
+        });
       });
     });
 
