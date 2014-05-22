@@ -16,8 +16,15 @@ function bboxToPlacesReqArr(bboxArray, options, map){
 
 	var reqArr = [];
 
+	console.log("BBOXES:" + bboxArray.length);
+
 	var i;
 	for (i=0; i<bboxArray.length; i++) {
+
+		var rectangle = new google.maps.Rectangle({
+			bounds: bboxArray[i],
+			map: map
+		});
 		
 		var req = (function() {
 			var reqOptions = {
@@ -36,7 +43,8 @@ function bboxToPlacesReqArr(bboxArray, options, map){
 						callback(result, pagination, map);
 
 					} else {
-						throw("BBox to Places request failed");
+
+						throw("BBox to Places request failed:" + status);
 					};
 				});
 			};

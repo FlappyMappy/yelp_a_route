@@ -1,0 +1,41 @@
+-User stories:
+
+--Base Requirements:
+
+As a route planner, I want to enter two locations and get a route, so I can see where I am going.
+
+As a traveler, I want to find places nearby our route, so I can see where to stop as I travel.
+
+As a road-tripper, I want to find places to stop within one mile of the highway, so I can find places to stop without driving too far out of the way.
+
+As a foodie, I want to find restaurants near my route, so I can find where to eat.
+
+As a bad navigator, I want to be able to select a place and get a new route directly there.
+>>getting a *list* of directions is not in the requirements but should not be difficult to implement
+
+As travel planner, I want to be able to change my desination or enter a new route, so I can compare what's along the way on those routes.
+
+As a traveler, I want to be able to search routes on my mobile phone, so I can quickly find places even on a small screen.
+
+--Beyond Base Requirements:
+
+As a picky eater, I want to be able to enter keywords and get restaurants that match.
+
+As a route planner, I want to drag waypoints and edit my route if I need to take an unusual path so I don't have to use the default route.
+
+As a spacial/visual oriented user, I want different types of places to have different icons, so I can easily see what type of places are near my route.
+
+As a really hungry person, I want to be able to sort the list of places by distance from origin, so we can go to the first place that's also on our route.
+
+Outline
+----BASE----
+-input several cities, output places nearby
+-filter results by distance
+-filter results by type
+-change route or start over
+-usable on smartphone/tablet
+----BEYOND----
+-search by keyword
+-visually edit route
+-representative place icons
+-sort results by distance
