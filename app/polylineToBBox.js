@@ -1,0 +1,13 @@
+//polyline is an array of google.maps.Point objects
+//dist is distance from polyline in km that Bounding Boxes will
+//surround
+function polylineToBBox(polyline, dist){
+
+    if (dist<=0){
+        throw "Distance must be greater than 0 KM";
+    } else if (!polyline.length>0){
+        throw "Polyline has no points";
+    };
+
+    return (new RouteBoxer).box(polyline, dist);
+};
