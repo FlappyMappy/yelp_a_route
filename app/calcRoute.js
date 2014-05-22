@@ -12,8 +12,6 @@ function calcRoute(start, end, callback, map) {
             new google.maps.DirectionsRenderer({map: map})
               .setDirections(result);
 
-            map.fitBounds(result.routes[0].bounds);
-
             callback(result);
         } else {
             throw "Route request failed";
