@@ -11,7 +11,8 @@ function calcRoute(start, end, callback, map) {
     };
     new google.maps.DirectionsService().route(request, function(result, status) {
         if (status == google.maps.DirectionsStatus.OK) {
-            new google.maps.DirectionsRenderer({map: map}).setDirections(result);
+            new google.maps.DirectionsRenderer({map: map})
+              .setDirections(result).setOptions(preserveViewport: true);
             //call function to map polyline and pass in the polyline
             //object from the results
             //result.routes[0].overview_path
