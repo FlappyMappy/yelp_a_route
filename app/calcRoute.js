@@ -13,6 +13,8 @@ function calcRoute(start, end, callback, map) {
             //object from the results
             //result.routes[0].overview_path
 
+            map.fitBounds(result.routes[0].bounds);
+
             callback(result);
         } else {
             throw "Route request failed";
