@@ -1,7 +1,6 @@
 //This function just gives me an overview_path array of points
 //for the route.
 function calcRoute(start, end, callback, map) {
-    clearBoxes();
 
     var request = {
         origin: start,
