@@ -1,5 +1,5 @@
 //This function just gives me an overview_path array of points
-//for the route. 
+//for the route.
 function calcRoute(start, end, callback, map) {
 
     var request = {
@@ -9,7 +9,7 @@ function calcRoute(start, end, callback, map) {
     };
     new google.maps.DirectionsService().route(request, function(result, status) {
         if (status == google.maps.DirectionsStatus.OK) {
-            //call function to map polyline and pass in the polyline 
+            //call function to map polyline and pass in the polyline
             //object from the results
             //result.routes[0].overview_path
 
