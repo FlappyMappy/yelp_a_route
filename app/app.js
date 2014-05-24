@@ -37,15 +37,16 @@ google.maps.event.addDomListener(window,'load',function() {
     console.log("Distance to search from route " + searchDistance);
 
     calcRoute($("#start").val(), $("#destination").val(), function(res){
-      var bboxArray = polylineToBBox(res.routes[0].overview_path, searchDistance);
+
+      //gets first 10 miles of directions path
+      var placesPathSegment = polylineMileSplit(parseFullPath(res.routes[0]), 0, 10);
+
+      var bboxArray = polylineToBBox(placesPathSegment, searchDistance);
 
       var placesReqArray = bboxToPlacesReqArr(bboxArray, searchOptions, map);
 
-      executePlacesReqArr(placesReqArray, function(results, pagination){
+      executePlacesReqArr(placesReqArray, parse_places_array);
 
-        console.log(results);
-
-      });
     }, map);
 
   });
