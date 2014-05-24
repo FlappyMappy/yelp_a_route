@@ -3,7 +3,9 @@
 // parse_places_array is called once for each google places request (once for each bounding box).
 // json_array will be an array with each cell containing a json string, representing one place.
 
-function parse_places_array (placesJSON, pagination, map) {
+var plot_places = require('./plot_places');
+
+module.exports = function parse_places_array (placesJSON, pagination, map) {
 
 
 

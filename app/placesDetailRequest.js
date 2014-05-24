@@ -2,7 +2,7 @@
 //and requests details from google maps 
 //and passes results to callback
 
-function placesDetailRequest(placeID, map, callback) {
+module.exports = function placesDetailRequest(placeID, map, callback) {
 	
 	(new google.maps.places.PlacesService(map)).getDetails({
 

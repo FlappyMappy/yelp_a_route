@@ -5,7 +5,7 @@
 //route - a single route from a directions search result object
 //returns - a high resolution path polyline
 
-function parseFullPath(route) {
+module.exports = function parseFullPath(route) {
 	
 	var fullPath = [];
 
