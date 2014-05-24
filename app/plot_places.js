@@ -1,7 +1,10 @@
 // plot_places takes an array of objects (parsed from the google json)
 // and uses each object's "lat" and "lng" to create an array of map markers.
 
-function plot_places (placesJSON, map) {
+
+var _ = require('underscore');
+
+module.exports = function plot_places (placesJSON, map) {
   var marker = new Array();  // the array to hold the map marker data
   var total_markers = 0;     // total markers in our array so far
 

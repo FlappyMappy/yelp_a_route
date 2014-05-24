@@ -2,7 +2,9 @@
 //that starts at mile startMile and ends at 
 //endMile
 
-function polylineMileSplit(polyline, startMile, endMile){
+var milesToMeters = require('./milesToMeters');
+
+module.exports = function polylineMileSplit(polyline, startMile, endMile){
 
 	startMeter = milesToMeters(startMile);
 	endMeter = milesToMeters(endMile);

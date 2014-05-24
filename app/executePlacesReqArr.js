@@ -7,7 +7,7 @@
 
 
 
-function executePlacesReqArr(reqArr, callback){
+module.exports = function executePlacesReqArr(reqArr, callback){
 	
 	function makeReq(){
 

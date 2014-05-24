@@ -1,0 +1,22 @@
+{
+  "name": "FlappyMappy",
+  "version": "0.0.1",
+  "homepage": "https://github.com/FlappyMappy/yelp_a_route",
+  "authors": [
+    "Kevin Stephens <kevinmstephens@gmail.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "underscore": "~1.6.0"
+  }
+}

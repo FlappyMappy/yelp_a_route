@@ -1,3 +1,18 @@
+
+var $ = require('jquery');
+var _ = require('underscore');
+
+
+var calcRoute = require('./calcRoute');
+var parseFullPath = require('./parseFullPath');
+var polylineToBBox = require('./polylineToBBox');
+var bboxToPlacesReqArr = require('./bboxToPlacesReqArr');
+var polylineMileSplit = require('./polylineMileSplit');
+var executePlacesReqArr = require('./executePlacesReqArr');
+var parse_places_array = require('./parse_places_array');
+var placesDetailRequest = require('./placesDetailRequest');
+
+
 google.maps.event.addDomListener(window,'load',function() {
 
   var mapOptions = {

@@ -10,7 +10,7 @@
 //Params map - google.maps.Map object
 
 
-function bboxToPlacesReqArr(bboxArray, options, map){
+module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 
 	var service = new google.maps.places.PlacesService(map);
 
