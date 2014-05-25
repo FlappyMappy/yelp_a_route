@@ -1,6 +1,11 @@
 //This function just gives me an overview_path array of points
 //for the route.
+
+paintRoute = require('./paintRoute.js');
+
 function calcRoute(start, end, callback, map) {
+
+    var directionsRender = new google.maps.DirectionsRenderer({map: map});
 
     var request = {
         origin: start,
@@ -9,13 +14,16 @@ function calcRoute(start, end, callback, map) {
     };
     new google.maps.DirectionsService().route(request, function(result, status) {
         if (status == google.maps.DirectionsStatus.OK) {
-            new google.maps.DirectionsRenderer({map: map})
-              .setDirections(result);
+            directionsRender.setDirections(result);
+            var route = result;
+            var dirRenderer = directionsRender
 
-            callback(result);
+            //we need to actually paint the route,
+            //how does this work the first time around?
+            callback(result, route, dirRenderer;
         } else {
-            throw "Route request failed";
-        };
+            throw "Calculating route request failed";
+        }
     });
-};
+}
 
