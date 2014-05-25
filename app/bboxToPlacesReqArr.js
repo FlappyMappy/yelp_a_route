@@ -10,7 +10,7 @@
 //Params map - google.maps.Map object
 
 
-function bboxToPlacesReqArr(bboxArray, options, map){
+module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 
 	var service = new google.maps.places.PlacesService(map);
 
@@ -21,10 +21,10 @@ function bboxToPlacesReqArr(bboxArray, options, map){
 	var i;
 	for (i=0; i<bboxArray.length; i++) {
 
-		var rectangle = new google.maps.Rectangle({
-			bounds: bboxArray[i],
-			map: map
-		});
+		// var rectangle = new google.maps.Rectangle({
+		// 	bounds: bboxArray[i],
+		// 	map: map
+		// });
 		
 		var req = (function() {
 			var reqOptions = {
