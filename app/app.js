@@ -49,10 +49,11 @@ google.maps.event.addDomListener(window,'load',function() {
     console.log("Search to: "   + $("#destination").val());
     console.log("Distance to search from route " + searchDistance);
 
+    mapObject.places.clearPlaces();
+
     calcRoute($("#start").val(), $("#destination").val(), function(res){
       //paint the route to the map
       paintRoute(res, mapObject.routeRenderer);
-      mapObject.places.clearPlaces();
 
       //gets first 10 miles of directions path
       var placesPathSegment = polylineMileSplit(parseFullPath(res.routes[0]), 0, 10);
@@ -63,10 +64,8 @@ google.maps.event.addDomListener(window,'load',function() {
 
       executePlacesReqArr(placesReqArray, function (result) {
         _.each(result, function (placeJSON) {
-          mapObject.places.addPlace(placeJSON, mapObject.map);
+          mapObject.places.addPlace(placeJSON, mapObject);
         });
-        //fix this, this will re-paint the entire places array
-        mapObject.places.paintMarkers(mapObject.map);
       });
 
     }, mapObject.map);
