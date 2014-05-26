@@ -1,16 +1,102 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var Places = require('./Places');
+
+//One instance of this object will be created and it will hold
+//an array of places objects.
+
+module.exports = function mapObject (mapElement, mapOptions) {
+  this.map = new google.maps.Map(mapElement, mapOptions);
+  this.routeRenderer = new google.maps.DirectionsRenderer({map: this.map});
+  this.places = new Places();
+  this.searchDistance = 2;
+  this.searchOptions = {
+    type: []
+  };
+};
+
+},{"./Places":3}],2:[function(require,module,exports){
+module.exports = function Place (placeJSON, map) {
+  this.placeJSON = placeJSON;
+  this.infoWindow = null;
+  this.marker = null;
+
+  this.paintPlace = function paintPlace (map) {
+
+    var that = this;
+
+    this.marker = new google.maps.Marker({
+
+        // for now, just get the name and location
+        position: this.placeJSON.geometry.location,
+        title: this.placeJSON.name,
+        map: map,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 3,
+          strokeWeight: 1,
+          fillOpacity: 1,
+          fillColor: "red"
+        }
+      });
+
+    this.infoWindow = new google.maps.InfoWindow({
+      content: "<b>Name: </b>" + this.placeJSON.name
+    });
+
+      //make info window close when the next one is opened
+
+    google.maps.event.addListener(this.marker, 'click', function() {
+
+      that.infoWindow.open(map, that.marker);
+    });
+
+    this.setMap = function setMap (map) {
+      that.marker.setMap(null);
+    };
+  };
+};
+
+},{}],3:[function(require,module,exports){
+var _ = require ("./bower_components/underscore/underscore.js");
+var Place = require('./Place');
+
+module.exports = function Places () {
+  this.places = [];
+  var that = this;
+
+  this.clearPlaces = function clearPlaces () {
+    _.each(that.places, function (place) {
+      place.marker.setMap(null);
+    });
+
+    this.places = [];
+  };
+
+  this.addPlace = function addPlace (placeJSON, map) {
+    this.places.push(new Place(placeJSON, map));
+  };
+
+  this.paintMarkers = function paintMarkers (map) {
+    _.each(this.places, function (placeInst) {
+      placeInst.paintPlace(map);
+    });
+  };
+};
+
+},{"./Place":2,"./bower_components/underscore/underscore.js":7}],4:[function(require,module,exports){
 
 var $ = require("./bower_components/jquery/dist/jquery.js");
 var _ = require("./bower_components/underscore/underscore.js");
 
-
+var MapObject = require('./MapObject');
 var calcRoute = require('./calcRoute');
+var paintRoute = require('./paintRoute');
+var Places = require('./Places');
 var parseFullPath = require('./parseFullPath');
 var polylineToBBox = require('./polylineToBBox');
 var bboxToPlacesReqArr = require('./bboxToPlacesReqArr');
 var polylineMileSplit = require('./polylineMileSplit');
 var executePlacesReqArr = require('./executePlacesReqArr');
-var parse_places_array = require('./parse_places_array');
 var placesDetailRequest = require('./placesDetailRequest');
 
 
@@ -21,20 +107,17 @@ google.maps.event.addDomListener(window,'load',function() {
        zoom: 4
   };
 
-  var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-  var searchDistance = 2;
-  var searchOptions = {
-    type: []
-  };
+  var mapObject = new MapObject(document.getElementById("map-canvas"), mapOptions);
+
 
   //adds/removes types from the seach options object when boxes clicked
   $("input[type=checkbox]").on("change", function(){
     var option = $(this).val();
     if($(this).is(":checked")){
-      searchOptions.type.push(option);
+      mapObject.searchOptions.type.push(option);
     } else {
-      var index = searchOptions.type.indexOf(option);
-      searchOptions.type.splice(index,index+1);
+      var index = mapObject.searchOptions.type.indexOf(option);
+      mapObject.searchOptions.type.splice(index,index+1);
     }
   });
 
@@ -53,21 +136,31 @@ google.maps.event.addDomListener(window,'load',function() {
     console.log("Distance to search from route " + searchDistance);
 
     calcRoute($("#start").val(), $("#destination").val(), function(res){
+      //paint the route to the map
+      paintRoute(res, mapObject.routeRenderer);
+      mapObject.places.clearPlaces();
 
       //gets first 10 miles of directions path
       var placesPathSegment = polylineMileSplit(parseFullPath(res.routes[0]), 0, 10);
 
       var bboxArray = polylineToBBox(placesPathSegment, searchDistance);
 
-      var placesReqArray = bboxToPlacesReqArr(bboxArray, searchOptions, map);
+      var placesReqArray = bboxToPlacesReqArr(bboxArray, mapObject.searchOptions, mapObject.map);
 
-      executePlacesReqArr(placesReqArray, parse_places_array);
+      executePlacesReqArr(placesReqArray, function (result) {
+        _.each(result, function (placeJSON) {
+          mapObject.places.addPlace(placeJSON, mapObject.map);
+        });
+        //fix this, this will re-paint the entire places array
+        mapObject.places.paintMarkers(mapObject.map);
+      });
 
-    }, map);
+    }, mapObject.map);
 
   });
 });
-},{"./bboxToPlacesReqArr":2,"./bower_components/jquery/dist/jquery.js":3,"./bower_components/underscore/underscore.js":4,"./calcRoute":5,"./executePlacesReqArr":6,"./parseFullPath":8,"./parse_places_array":9,"./placesDetailRequest":10,"./polylineMileSplit":12,"./polylineToBBox":13}],2:[function(require,module,exports){
+
+},{"./MapObject":1,"./Places":3,"./bboxToPlacesReqArr":5,"./bower_components/jquery/dist/jquery.js":6,"./bower_components/underscore/underscore.js":7,"./calcRoute":8,"./executePlacesReqArr":9,"./paintRoute":11,"./parseFullPath":12,"./placesDetailRequest":13,"./polylineMileSplit":14,"./polylineToBBox":15}],5:[function(require,module,exports){
 
 //Function takes an array of bounding boxes and options and
 //returns an array of request functions that accept a callback
@@ -95,7 +188,7 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 		// 	bounds: bboxArray[i],
 		// 	map: map
 		// });
-		
+
 		var req = (function() {
 			var reqOptions = {
 				bounds: bboxArray[i],
@@ -107,7 +200,7 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 			return function(callback) {
 
 				service.nearbySearch(reqOptions, function(result, status, pagination) {
-					
+
 					if (status == google.maps.places.PlacesServiceStatus.OK){
 
 						callback(result, pagination, map);
@@ -118,14 +211,15 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 					};
 				});
 			};
-		})();
-		
+		})(); //what are the parens for?
+
 		reqArr.push(req);
 	};
 
 	return reqArr;
 };
-},{}],3:[function(require,module,exports){
+
+},{}],6:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.1
  * http://jquery.com/
@@ -9317,7 +9411,7 @@ return jQuery;
 
 }));
 
-},{}],4:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 //     Underscore.js 1.6.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -10662,7 +10756,7 @@ return jQuery;
   }
 }).call(this);
 
-},{}],5:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 //This function just gives me an overview_path array of points
 //for the route.
 
@@ -10675,11 +10769,8 @@ module.exports = function calcRoute(start, end, callback, map) {
     };
     new google.maps.DirectionsService().route(request, function(result, status) {
         if (status == google.maps.DirectionsStatus.OK) {
-            //call function to map polyline and pass in the polyline
-            //object from the results
-            //result.routes[0].overview_path
 
-            map.fitBounds(result.routes[0].bounds);
+            // map.fitBounds(result.routes[0].bounds);
 
             callback(result);
         } else {
@@ -10689,7 +10780,7 @@ module.exports = function calcRoute(start, end, callback, map) {
 };
 
 
-},{}],6:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 //Function takes an array of Google Places 
 //request functions and executes each one
 //in order with a time delay
@@ -10714,13 +10805,22 @@ module.exports = function executePlacesReqArr(reqArr, callback){
 
 	makeReq();
 };
-},{}],7:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 //method to convert from miles to meters.
 //Returns integer of meters
 module.exports = function milesToMeters(miles) {
 	return parseInt(miles * 1609.34);
 };
-},{}],8:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
+
+//paint the route
+module.exports = function paintRoute (routes, routeRenderer) {
+  if(routeRenderer instanceof google.maps.DirectionsRenderer) {
+    routeRenderer.setDirections(routes);
+  };
+};
+
+},{}],12:[function(require,module,exports){
 //parses the full resolution path polyline
 //from a routes result object. This is instead
 //of using overview polyline which is a low resolution
@@ -10743,33 +10843,7 @@ module.exports = function parseFullPath(route) {
 	return fullPath;
 
 };
-},{}],9:[function(require,module,exports){
-// Updated to handle a single buffer request per call.
-
-// parse_places_array is called once for each google places request (once for each bounding box).
-// json_array will be an array with each cell containing a json string, representing one place.
-
-var plot_places = require('./plot_places');
-
-module.exports = function parse_places_array (placesJSON, pagination, map) {
-
-
-
-	//call any functions that want this data
-	//call paint to google maps
-
-	//console.log(placesJSON);
-	plot_places(placesJSON, map);
-
-
-
-	// console.log("results done");
-	// console.log(places_data);
-
-	//call function that holds and populates list div
-
-};
-},{"./plot_places":11}],10:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 //this method takes a unique places ID
 //and requests details from google maps 
 //and passes results to callback
@@ -10791,55 +10865,7 @@ module.exports = function placesDetailRequest(placeID, map, callback) {
 	);
 
 };
-},{}],11:[function(require,module,exports){
-// plot_places takes an array of objects (parsed from the google json)
-// and uses each object's "lat" and "lng" to create an array of map markers.
-
-
-var _ = require("./bower_components/underscore/underscore.js");
-
-module.exports = function plot_places (placesJSON, map) {
-  var marker = new Array();  // the array to hold the map marker data
-  var total_markers = 0;     // total markers in our array so far
-
-  _.each(placesJSON, function (place) {
-
-    (function () {
-
-
-
-      var newMarker = new google.maps.Marker({
-        
-        // for now, just get the name and location
-        position: place.geometry.location,
-        title: place.name,
-        map: map,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 3,
-          strokeWeight: 1,
-          fillOpacity: 1,
-          fillColor: "red"
-        }
-      });
-
-      var newInfoWindow = new google.maps.InfoWindow({
-        content: "<b>Name: </b>" + place.name
-      });
-
-      //make info window close when the next one is opened
-
-
-      google.maps.event.addListener(newMarker, 'click', function() {
-        
-        newInfoWindow.open(map,newMarker);
-      });
-
-    })();
-  });
-};
-
-},{"./bower_components/underscore/underscore.js":4}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 //This function will take a polyline and return a polyline
 //that starts at mile startMile and ends at 
 //endMile
@@ -10870,7 +10896,7 @@ module.exports = function polylineMileSplit(polyline, startMile, endMile){
 	};
 	return newPolyline;
 };
-},{"./milesToMeters":7}],13:[function(require,module,exports){
+},{"./milesToMeters":10}],15:[function(require,module,exports){
 //polyline is an array of google.maps.Point objects
 //dist is distance from polyline in km that Bounding Boxes will
 //surround
@@ -10886,4 +10912,4 @@ module.exports = function polylineToBBox(polyline, dist){
     return (new RouteBoxer).box(polyline, dist);
 };
 
-},{}]},{},[1,2,5,6,7,8,9,10,11,12,13])
+},{}]},{},[1,2,3,4,5,8,9,10,11,12,13,14,15])

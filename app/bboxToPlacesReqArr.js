@@ -25,7 +25,7 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 		// 	bounds: bboxArray[i],
 		// 	map: map
 		// });
-		
+
 		var req = (function() {
 			var reqOptions = {
 				bounds: bboxArray[i],
@@ -37,7 +37,7 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 			return function(callback) {
 
 				service.nearbySearch(reqOptions, function(result, status, pagination) {
-					
+
 					if (status == google.maps.places.PlacesServiceStatus.OK){
 
 						callback(result, pagination, map);
@@ -48,8 +48,8 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 					};
 				});
 			};
-		})();
-		
+		})(); //what are the parens for?
+
 		reqArr.push(req);
 	};
 

@@ -2,14 +2,15 @@
 var $ = require('jquery');
 var _ = require('underscore');
 
-
+var MapObject = require('./MapObject');
 var calcRoute = require('./calcRoute');
+var paintRoute = require('./paintRoute');
+var Places = require('./Places');
 var parseFullPath = require('./parseFullPath');
 var polylineToBBox = require('./polylineToBBox');
 var bboxToPlacesReqArr = require('./bboxToPlacesReqArr');
 var polylineMileSplit = require('./polylineMileSplit');
 var executePlacesReqArr = require('./executePlacesReqArr');
-var parse_places_array = require('./parse_places_array');
 var placesDetailRequest = require('./placesDetailRequest');
 
 
@@ -20,20 +21,17 @@ google.maps.event.addDomListener(window,'load',function() {
        zoom: 4
   };
 
-  var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-  var searchDistance = 2;
-  var searchOptions = {
-    type: []
-  };
+  var mapObject = new MapObject(document.getElementById("map-canvas"), mapOptions);
+
 
   //adds/removes types from the seach options object when boxes clicked
   $("input[type=checkbox]").on("change", function(){
     var option = $(this).val();
     if($(this).is(":checked")){
-      searchOptions.type.push(option);
+      mapObject.searchOptions.type.push(option);
     } else {
-      var index = searchOptions.type.indexOf(option);
-      searchOptions.type.splice(index,index+1);
+      var index = mapObject.searchOptions.type.indexOf(option);
+      mapObject.searchOptions.type.splice(index,index+1);
     }
   });
 
@@ -52,17 +50,26 @@ google.maps.event.addDomListener(window,'load',function() {
     console.log("Distance to search from route " + searchDistance);
 
     calcRoute($("#start").val(), $("#destination").val(), function(res){
+      //paint the route to the map
+      paintRoute(res, mapObject.routeRenderer);
+      mapObject.places.clearPlaces();
 
       //gets first 10 miles of directions path
       var placesPathSegment = polylineMileSplit(parseFullPath(res.routes[0]), 0, 10);
 
       var bboxArray = polylineToBBox(placesPathSegment, searchDistance);
 
-      var placesReqArray = bboxToPlacesReqArr(bboxArray, searchOptions, map);
+      var placesReqArray = bboxToPlacesReqArr(bboxArray, mapObject.searchOptions, mapObject.map);
 
-      executePlacesReqArr(placesReqArray, parse_places_array);
+      executePlacesReqArr(placesReqArray, function (result) {
+        _.each(result, function (placeJSON) {
+          mapObject.places.addPlace(placeJSON, mapObject.map);
+        });
+        //fix this, this will re-paint the entire places array
+        mapObject.places.paintMarkers(mapObject.map);
+      });
 
-    }, map);
+    }, mapObject.map);
 
   });
 });
