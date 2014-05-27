@@ -58,6 +58,11 @@ google.maps.event.addDomListener(window,'load',function() {
   });
 
   //empties search box when clicked
+  $("#new-route-button").on("click", function(){
+        $('#route-box').removeClass('hide');
+  });  
+
+  //empties search box when clicked
   $(".search-box").on("focus", function(){
     $(this).val("");
   });
@@ -108,16 +113,6 @@ google.maps.event.addDomListener(window,'load',function() {
       zoomMapObject.map.fitBounds(oneBBOX);
       zoomMapObject.map.setCenter(placesPathSegment[0]);
       zoomMapObject.map.setZoom(11);
-
-     var rectangle = new google.maps.Rectangle({
-        strokeColor: '#FF0000',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#FF0000',
-        fillOpacity: 0.35,
-        map: zoomMapObject.map,
-        bounds: oneBBOX
-      });
 
       indexMarker = new google.maps.Marker({
 

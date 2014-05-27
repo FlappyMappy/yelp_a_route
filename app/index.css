@@ -47,8 +47,19 @@ div.map-container
   left: 0;
   right: 425px;
   bottom: 40px;
-  top: 70px;
+  top: 75px;
 
+  }
+
+  div.right-column
+  {
+
+  position: absolute;
+  width: 415px;
+  right: 0;
+  bottom: 40px;
+  top: 75px;
+  background-color: rgba(96, 255, 128, .3);
   }
 
 div.hide
@@ -92,14 +103,7 @@ div.index-map
   border-color: black;
   }
 
-div.right-column
-  {
-  position: absolute;
-  width: 425px;
-  right: 0;
-  bottom: 40px;
-  top: 60px;
-  }
+
 
 .popup-search-box
   {
@@ -119,13 +123,6 @@ div.right-column
   float: left;
   z-index: 20;
   height: 30px;
-  }
-
-
-#list-box
-  {
-  height: 240px;
-  padding: 20px;
   }
 
 .letter
