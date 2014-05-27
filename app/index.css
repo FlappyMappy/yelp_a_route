@@ -29,7 +29,6 @@ header.top-bar
   background-color: rgb(96, 255, 128);
   color: black;
   text-align: center;
-  font-family: arial;
   font-weight: bold;
   font-size: 20pt;
   position: absolute;
@@ -190,7 +189,6 @@ div.list-display
   background-color: white;
   height: 150px;
   padding: 10px;
-  overflow: scroll;
   }
 
 div.bottom
@@ -207,5 +205,28 @@ div.bottom
 
   }
 
+<<<<<<< HEAD
+/*this is the options panel closed*/
+.options-panel article{
+  margin-top: -1px;
+  overflow: hidden;
+  height: 0px;
+  position: relative;
+  z-index: 10;
+  transition:
+    height 0.3s ease-in-out,
+    box-shadow 0.6s linear;
+}
 
+/*this is the options panel open*/
+.options-panel input:checked ~ article{
+  height: 140px;
+  display: block;
+  transition:
+    height 0.5s ease-in-out,
+    box-shadow 0.1s linear;
+}
+=======
+
+>>>>>>> master
 

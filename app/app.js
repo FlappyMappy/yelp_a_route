@@ -17,7 +17,7 @@ var kilometersPerMile = 1.6;
 google.maps.event.addDomListener(window,'load',function() {
 
 
-  var mapObject = new MapObject(document.getElementById("index-map-canvas"),   
+  var mapObject = new MapObject(document.getElementById("index-map-canvas"),
     {
        center: new google.maps.LatLng( 39.8,-98.6),
        zoom: 4,
@@ -33,7 +33,7 @@ google.maps.event.addDomListener(window,'load',function() {
   });
 
 
-  var zoomMapObject = new MapObject(document.getElementById("zoom-map-canvas"),   
+  var zoomMapObject = new MapObject(document.getElementById("zoom-map-canvas"),
     {
        center: new google.maps.LatLng( 39.8,-98.6),
        zoom: 4
@@ -57,14 +57,10 @@ google.maps.event.addDomListener(window,'load',function() {
     }
   });
 
+
   //empties search box when clicked
   $("#new-route-button").on("click", function(){
         $('#route-box').removeClass('hide');
-  });  
-
-  //empties search box when clicked
-  $(".search-box").on("focus", function(){
-    $(this).val("");
   });
 
   //starts route search based on search boxes when submit button clicked
@@ -72,7 +68,7 @@ google.maps.event.addDomListener(window,'load',function() {
     //preventDefault stops a new page from loading
     event.preventDefault();
     mapObject.searchDistance = $("#distances").val() * kilometersPerMile;
-    mapObject.searchOptions.keywords = ($("#keyword").val());
+    mapObject.searchOptions.keyword = ($("#keyword").val());
 
     console.log("Search from: " + $("#start").val());
     console.log("Search to: "   + $("#destination").val());

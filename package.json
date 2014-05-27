@@ -16,6 +16,8 @@
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-express-server": "^0.4.17",
+    "handlebars": "^1.3.0",
+    "hbsfy": "^1.3.2",
     "install": "^0.1.7",
     "matchdep": "^0.3.0",
     "npm": "^1.4.13"
