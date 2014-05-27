@@ -11,4 +11,5 @@ module.exports = function mapObject (mapElement, mapOptions) {
   this.searchOptions = {
     type: []
   };
+  this.openInfoWindow = null;
 };

@@ -6,20 +6,17 @@ module.exports = function Places () {
   var that = this;
 
   this.clearPlaces = function clearPlaces () {
-    _.each(that.places, function (place) {
-      place.marker.setMap(null);
-    });
+    
+    if (that.places.length>0){
+      _.each(that.places, function (place) {
+        place.marker.setMap(null);
+      });
+    };
 
     this.places = [];
   };
 
-  this.addPlace = function addPlace (placeJSON, map) {
-    this.places.push(new Place(placeJSON, map));
-  };
-
-  this.paintMarkers = function paintMarkers (map) {
-    _.each(this.places, function (placeInst) {
-      placeInst.paintPlace(map);
-    });
+  this.addPlace = function addPlace (placeJSON, mapObject) {
+    this.places.push(new Place(placeJSON, mapObject));
   };
 };
