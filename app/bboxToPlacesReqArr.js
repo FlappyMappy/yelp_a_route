@@ -1,4 +1,4 @@
-
+"use strict";
 //Function takes an array of bounding boxes and options and
 //returns an array of request functions that accept a callback
 //and pass it results and pagination of google places
@@ -19,24 +19,20 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 		console.log(j + options[j]);
 	}
 	console.log("BBOXES:" + bboxArray.length);
-	var reqOptions = {
-		types: options["types"],
-		keyword: options["keywords"]
-	};
 
 	var i;
 	for (i=0; i<bboxArray.length; i++) {
 
-		// var rectangle = new google.maps.Rectangle({
-		// 	bounds: bboxArray[i],
-		// 	map: map
-		// });
-
 		var req = (function() {
+			var reqOptions = {
+				types: options.types,
+				keyword: options.keyword
+			};
+
 			reqOptions.bounds = bboxArray[i];
 
 			return function(callback) {
-
+				console.dir(reqOptions.bounds);
 				service.nearbySearch(reqOptions, function(result, status, pagination) {
 
 					if (status == google.maps.places.PlacesServiceStatus.OK){
@@ -49,7 +45,7 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 					};
 				});
 			};
-		})(); //what are the parens for?
+		})();
 
 		reqArr.push(req);
 	};

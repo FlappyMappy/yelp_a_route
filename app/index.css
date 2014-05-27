@@ -10,7 +10,6 @@ header.top-bar
   background-color: rgb(96, 255, 128);
   color: black;
   text-align: center;
-  font-family: arial;
   font-weight: bold;
   font-size: 20pt;
   padding: 10px;
@@ -157,7 +156,6 @@ div.list-display
   background-color: white;
   height: 150px;
   padding: 10px;
-  overflow: scroll;
   }
 
 div.bottom
@@ -189,8 +187,6 @@ div.bottom
 
 /*this is the options panel closed*/
 .options-panel article{
-/*  background-color: rgba(255, 255, 255, .3);
-  border-radius: 20px;*/
   margin-top: -1px;
   overflow: hidden;
   height: 0px;
@@ -204,11 +200,9 @@ div.bottom
 /*this is the options panel open*/
 .options-panel input:checked ~ article{
   height: 140px;
-/*  padding: 7px;
-*/  display: block;
+  display: block;
   transition:
     height 0.5s ease-in-out,
     box-shadow 0.1s linear;
-/*    box-shadow: 5px 5px 5px rgba(0, 0, 0, .75);
-*/}
+}
 

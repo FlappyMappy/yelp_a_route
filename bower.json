@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "jquery": "~2.1.1",
-    "underscore": "~1.6.0"
+    "underscore": "~1.6.0",
+    "hbs": "~0.8.0"
   }
 }

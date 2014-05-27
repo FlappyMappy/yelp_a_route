@@ -1,48 +1,80 @@
+<!doctype html>
+
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Yelp a Route</title>
-      <style type="text/css">
-        html { height: 100% }
-        body { height: 100%; margin: 0; padding: 0; background-color: #4F4F4F}
-        #map-canvas { height: 500px }
-        header {}
-    </style>
-  </head>
-  <body>
-    <div class="my-content">
-    <p>
-      <h1>Along the Way</h1>
-    </p>
+
+<head>
+  <title>FlappyMappy!</title>
+  <meta charset="UTF-8">
+  <link rel = "stylesheet" type = "text/css" href = "index.css"></style>
+</head>
+
+<body>
+  <header class = "top-bar">
+    FlappyMappy!
+  </header>
+
+  <div class = "content-row">
+
+    <div class = "map-container">
+      <div class = "zoom-map" id = "zoom-map-canvas"></div>
+      <div class = "index-map" id = "index-map-canvas"></div>
     </div>
-    <header>
-      <form type="POST" class="search">
-        <div class="search-boxes">
-          Start: <input id="start" class="search-box" placeholder="Seattle, WA" autofocus required>
-          Destination <input id="destination" class="search-box" placeholder="San Francisco, CA"required>
-          <button>Search</button>
-        <div class="options">
-          Food <input type="checkbox" class="food-checkbox" value="food">
-          Gas <input type="checkbox"  class="gas-checkbox" value="gas_station">
-          Shopping <input type="checkbox" class="shopping-checkbox" value="store">
-          Distance:
+
+    <div class = "right-column">
+
+      <div id="route-box" class = "box">
+
+        <form type = "POST" class = "search">
+          <div class = "inputs">
+            <div id = "a" class= "letter">A</div>
+            <input type = "text" id="start" class = "search-box" placeholder = "Where From?" value = "seattle" required>
+            <br><br>
+            <div id = "b" class="letter">B</div>
+            <input type = "text" id="destination" class = "search-box" placeholder = "Where To?" value = "lynnwood" required>
+          </div>
+          <div id = "route-button-wrapper">
+            <button id = "route-button">New Route</button>
+          </div>
+        </form>
+
+      </div>
+      <section class="options-panel box">
+        <input id="options" type="checkbox" />
+        <label for="options">Options</label>
+        <article>
+          Search
           <select id="distances">
             <option value="1">1</option>
             <option value="2" selected>2</option>
             <option value="5">5</option>
             <option value="10">10</option>
           </select>
+          miles from route for:
+          <div id="types">
+            Food <input type="checkbox" id="food-checkbox" class="option-checkbox" value="food">
+            Gas <input type="checkbox"  id="gas-checkbox" class="option-checkbox" value="gas_station">
+            Shopping <input type="checkbox" id="shopping-checkbox" class="option-checkbox" value="store">
+          </div>
+          <br />
+          <input type="text" id="keyword" class="search-box" value="" placeholder="Restaurants, Pet Shops, etc.">
+        </article>
+      </section>
+
+      <div id="list-box" class = "box">
+        <div class = "list-display">
+          LIST BOX
         </div>
-      </form>
-    </header>
+      </div>
+    </div>
+  </div>
 
-    <sidebar id="list-view">
-    </sidebar>
+  <div class="bottom">
+    Team FlappyMappy, 2014
+  </div>
 
-    <div id = "map-canvas"></div>
-    <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization,places&key=AIzaSyA7tOZNjgHPNh5a-zL1Mo9EFIysbwUU4s4&sensor=false"></script>
-    <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/routeboxer/src/RouteBoxer.js"></script>
-    <script src = "app.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization,places&key=AIzaSyA7tOZNjgHPNh5a-zL1Mo9EFIysbwUU4s4&sensor=false"></script>
+  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/routeboxer/src/RouteBoxer.js"></script>
+  <script src = "app.js"></script>
 
-  </body>
+</body>
 </html>

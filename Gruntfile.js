@@ -27,7 +27,7 @@ module.exports = function (grunt) {
                 dest: 'dist/app.js'
             },
             options: {
-                transform: ['debowerify'],
+                transform: ['debowerify', 'hbsfy'],
                 debug: true
             }
         },
@@ -48,10 +48,6 @@ module.exports = function (grunt) {
                 tasks: ['browserify']
             },
 
-            assets: {
-                files: ['*.css', 'images/**/*', 'img/**/*', '!Gruntfile.js'],
-                tasks: ['copy']
-            }
         },
 
         jshint: {
