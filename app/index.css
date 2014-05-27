@@ -1,47 +1,88 @@
+html
+  {
+
+    width: 100%;
+    height: 100%;
+    position: absolute;
+
+  }
+
+
 body
   {
   font-family: arial;
   background-color: rgb(64, 64, 64);
   background-image: url("background3.png");
+  padding: 10px;
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  cursor: default;
   }
 
 header.top-bar
   {
+  border-radius: 10px;
   background-color: rgb(96, 255, 128);
   color: black;
   text-align: center;
   font-weight: bold;
   font-size: 20pt;
-  padding: 10px;
-  border-radius: 10px;
-  box-shadow: 5px 5px 5px rgb(0, 0, 0);
-  margin: 10px;
+  position: absolute;
+  width:100%;
+  top: 10px;
+  padding-top:10px;
+  padding-bottom: 10px;
   }
-
-div.content-row
-  {
-  padding-right: 450px;
-  }
-
 
 div.map-container
   {
-  background-color: rgb(255, 255, 255);
-  float: left;
-  width: 100%;
-  height: 450px;
-  border-radius: 10px;
-  box-shadow: 5px 5px 5px rgb(0, 0, 0);
-  margin-right: 20px;
-  margin-left: 10px;
-  position: relative;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  left: 0;
+  right: 425px;
+  bottom: 40px;
+  top: 75px;
+
   }
+
+  div.right-column
+  {
+
+  position: absolute;
+  width: 415px;
+  right: 0;
+  bottom: 40px;
+  top: 75px;
+  background-color: rgba(96, 255, 128, .3);
+  }
+
+div.hide
+{
+  display: none;
+}
+
+div.popup-search
+{
+
+  padding: 50px;
+  margin: auto;
+  border-radius: 10px;
+  z-index: 20;
+
+}
 
 div.zoom-map
   {
+  margin: 0px;
+  padding: 0px;
   width: 100%;
   height: 100%;
-  position: aboslute;
+  position: absolute;
   z-index: 10
   }
 
@@ -61,33 +102,26 @@ div.index-map
   border-color: black;
   }
 
-div.right-column
-  {
-  float: left;
-  position: relative;
-  width: 420px;
-  margin-right: -450px;
-  }
 
-.box
+
+.popup-search-box
   {
-  background-color: rgba(255, 255, 255, .3);
+  margin: auto;
+  background-color: blue;
+  height: 400px;
+  width: 400px; 
   border-radius: 10px;
   box-shadow: 5px 5px 5px rgb(0, 0, 0);
-  margin-bottom: 20px;
-  margin-right: 10px;
   padding: 10px;
   }
 
-#route-box
+  .options-panel
   {
-  height: 150px;
-  }
-
-#list-box
-  {
-  height: 240px;
-  padding: 20px;
+  margin: 20px;
+  position: relative;
+  float: left;
+  z-index: 20;
+  height: 30px;
   }
 
 .letter
@@ -140,7 +174,6 @@ div #route-button-wrapper
   height: 110px;
   box-shadow: 5px 5px 5px rgba(0, 0, 0, .75);
   cursor: pointer;
-
   }
 
 input.search-box
@@ -160,31 +193,19 @@ div.list-display
 
 div.bottom
   {
+  vertical-align: middle;
   clear: both;
   color: white;
   font-size: 10pt;
   text-align: center;
-  margin-left: 10px;
-  padding-top: 20px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 25px;
+
   }
 
-.options-panel label{
-  position: relative;
-  z-index: 20;
-  display: block;
-  height: 30px;
-  cursor: pointer;
-}
-
-.options-panel label:hover{
-  color: #fff;
-}
-
-/*invisible checkbox, activated by clocking label, above*/
-.options-panel #options{
-  display: none;
-}
-
+<<<<<<< HEAD
 /*this is the options panel closed*/
 .options-panel article{
   margin-top: -1px;
@@ -205,4 +226,7 @@ div.bottom
     height 0.5s ease-in-out,
     box-shadow 0.1s linear;
 }
+=======
+
+>>>>>>> master
 
