@@ -109,7 +109,7 @@ div.index-map
   margin: auto;
   background-color: blue;
   height: 400px;
-  width: 400px; 
+  width: 400px;
   border-radius: 10px;
   box-shadow: 5px 5px 5px rgb(0, 0, 0);
   padding: 10px;
@@ -204,29 +204,4 @@ div.bottom
   height: 25px;
 
   }
-
-<<<<<<< HEAD
-/*this is the options panel closed*/
-.options-panel article{
-  margin-top: -1px;
-  overflow: hidden;
-  height: 0px;
-  position: relative;
-  z-index: 10;
-  transition:
-    height 0.3s ease-in-out,
-    box-shadow 0.6s linear;
-}
-
-/*this is the options panel open*/
-.options-panel input:checked ~ article{
-  height: 140px;
-  display: block;
-  transition:
-    height 0.5s ease-in-out,
-    box-shadow 0.1s linear;
-}
-=======
-
->>>>>>> master
 

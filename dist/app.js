@@ -146,6 +146,12 @@ google.maps.event.addDomListener(window,'load',function() {
     }
   });
 
+
+  //empties search box when clicked
+  $("#new-route-button").on("click", function(){
+        $('#route-box').removeClass('hide');
+  });
+
   //starts route search based on search boxes when submit button clicked
   $(".search").on("submit", function(event){
     //preventDefault stops a new page from loading
@@ -156,6 +162,8 @@ google.maps.event.addDomListener(window,'load',function() {
     console.log("Search from: " + $("#start").val());
     console.log("Search to: "   + $("#destination").val());
     console.log("Distance to search from route " + mapObject.searchDistance + "kms");
+
+    $('#route-box').addClass('hide');
 
     zoomMapObject.places.clearPlaces();
 
@@ -190,16 +198,6 @@ google.maps.event.addDomListener(window,'load',function() {
       zoomMapObject.map.fitBounds(oneBBOX);
       zoomMapObject.map.setCenter(placesPathSegment[0]);
       zoomMapObject.map.setZoom(11);
-
-     var rectangle = new google.maps.Rectangle({
-        strokeColor: '#FF0000',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#FF0000',
-        fillOpacity: 0.35,
-        map: zoomMapObject.map,
-        bounds: oneBBOX
-      });
 
       indexMarker = new google.maps.Marker({
 
@@ -10983,7 +10981,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "  </div>\n<div>";
+    + "</div>\n<div>";
   if (helper = helpers.formatted_address) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.formatted_address); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
