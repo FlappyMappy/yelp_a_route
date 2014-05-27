@@ -5,7 +5,7 @@ module.exports = function (grunt) {
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
     grunt.initConfig({
-    
+
         pkg: grunt.file.readJSON('package.json'),
 
         clean: ['dist'],
@@ -14,7 +14,7 @@ module.exports = function (grunt) {
             all: {
                 expand: true,
                 cwd: 'app/',
-                src: ['*.css', '*.html', '/images/**/*', '!Gruntfile.js'],
+                src: ['*.css', '*.html', 'images/**/*', '!Gruntfile.js'],
                 dest: 'dist/',
                 flatten: true,
                 filter: 'isFile'
@@ -75,5 +75,5 @@ module.exports = function (grunt) {
     grunt.registerTask('serve', ['server']);
     grunt.registerTask('test', ['jshint']);
     grunt.registerTask('build', ['clean', 'browserify', 'copy']);
-    
+
 };
