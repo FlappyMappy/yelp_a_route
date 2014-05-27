@@ -69,6 +69,8 @@ google.maps.event.addDomListener(window,'load',function() {
     console.log("Search to: "   + $("#destination").val());
     console.log("Distance to search from route " + searchDistance);
 
+    $('#route-box').addClass('hide');
+
     zoomMapObject.places.clearPlaces();
 
     calcRoute($("#start").val(), $("#destination").val(), function(res){
