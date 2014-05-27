@@ -8,6 +8,7 @@
   "devDependencies": {
     "browserify": "^4.1.5",
     "debowerify": "^0.7.1",
+    "chai": "^1.9.1",
     "globule": "^0.2.0",
     "grunt": "^0.4.5",
     "grunt-browserify": "^2.1.0",
@@ -16,8 +17,10 @@
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-express-server": "^0.4.17",
+    "grunt-mocha-test": "^0.10.2",
+    "mocha": "^1.18.2",
     "install": "^0.1.7",
     "matchdep": "^0.3.0",
-    "npm": "^1.4.13"
+    "superagent": "^0.18.0"
   }
 }

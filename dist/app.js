@@ -3,6 +3,8 @@ var Places = require('./Places');
 
 //One instance of this object will be created and it will hold
 //an array of places objects.
+//Within searchOptions, types is an array of strings,
+//keywords must be a string, but it may have several space-delimited values
 
 module.exports = function mapObject (mapElement, mapOptions) {
   this.map = new google.maps.Map(mapElement, mapOptions);
@@ -10,50 +12,48 @@ module.exports = function mapObject (mapElement, mapOptions) {
   this.places = new Places();
   this.searchDistance = 2;
   this.searchOptions = {
-    type: []
+    types: [],
+    keywords: ""
   };
+  this.openInfoWindow = null;
 };
 
 },{"./Places":3}],2:[function(require,module,exports){
-module.exports = function Place (placeJSON, map) {
+module.exports = function Place (placeJSON, mapObject) {
+  var that = this;
   this.placeJSON = placeJSON;
-  this.infoWindow = null;
-  this.marker = null;
 
-  this.paintPlace = function paintPlace (map) {
+  this.marker = new google.maps.Marker({
 
-    var that = this;
-
-    this.marker = new google.maps.Marker({
-
-        // for now, just get the name and location
-        position: this.placeJSON.geometry.location,
-        title: this.placeJSON.name,
-        map: map,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 3,
-          strokeWeight: 1,
-          fillOpacity: 1,
-          fillColor: "red"
-        }
-      });
-
-    this.infoWindow = new google.maps.InfoWindow({
-      content: "<b>Name: </b>" + this.placeJSON.name
+      // for now, just get the name and location
+      position: this.placeJSON.geometry.location,
+      title: this.placeJSON.name,
+      map: mapObject.map,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 3,
+        strokeWeight: 1,
+        fillOpacity: 1,
+        fillColor: "red"
+      }
     });
 
-      //make info window close when the next one is opened
+  this.infoWindow = new google.maps.InfoWindow({
+    content: "<b>Name: </b>" + this.placeJSON.name
+  });
 
-    google.maps.event.addListener(this.marker, 'click', function() {
+  google.maps.event.addListener(this.marker, 'click', function() {
 
-      that.infoWindow.open(map, that.marker);
-    });
-
-    this.setMap = function setMap (map) {
-      that.marker.setMap(null);
+    that.infoWindow.open(mapObject.map, that.marker);
+    
+    if (mapObject.openInfoWindow!==null){
+      mapObject.openInfoWindow.close();
+      console.log("closing info");
     };
-  };
+
+    mapObject.openInfoWindow = that.infoWindow;
+
+  });
 };
 
 },{}],3:[function(require,module,exports){
@@ -65,21 +65,18 @@ module.exports = function Places () {
   var that = this;
 
   this.clearPlaces = function clearPlaces () {
-    _.each(that.places, function (place) {
-      place.marker.setMap(null);
-    });
+    
+    if (that.places.length>0){
+      _.each(that.places, function (place) {
+        place.marker.setMap(null);
+      });
+    };
 
     this.places = [];
   };
 
-  this.addPlace = function addPlace (placeJSON, map) {
-    this.places.push(new Place(placeJSON, map));
-  };
-
-  this.paintMarkers = function paintMarkers (map) {
-    _.each(this.places, function (placeInst) {
-      placeInst.paintPlace(map);
-    });
+  this.addPlace = function addPlace (placeJSON, mapObject) {
+    this.places.push(new Place(placeJSON, mapObject));
   };
 };
 
@@ -98,26 +95,48 @@ var bboxToPlacesReqArr = require('./bboxToPlacesReqArr');
 var polylineMileSplit = require('./polylineMileSplit');
 var executePlacesReqArr = require('./executePlacesReqArr');
 var placesDetailRequest = require('./placesDetailRequest');
-
+var kilometersPerMile = 1.6;
 
 google.maps.event.addDomListener(window,'load',function() {
 
-  var mapOptions = {
+
+  var mapObject = new MapObject(document.getElementById("index-map-canvas"),   
+    {
+       center: new google.maps.LatLng( 39.8,-98.6),
+       zoom: 4,
+       disableDefaultUI: true
+    }
+  );
+
+  mapObject.routeRenderer.setOptions({
+    suppressMarkers: true,
+    polylineOptions: {
+      strokeColor: 'black'
+    }
+  });
+
+
+  var zoomMapObject = new MapObject(document.getElementById("zoom-map-canvas"),   
+    {
        center: new google.maps.LatLng( 39.8,-98.6),
        zoom: 4
-  };
+    }
+  );
 
-  var mapObject = new MapObject(document.getElementById("map-canvas"), mapOptions);
-
+  zoomMapObject.routeRenderer.setOptions({
+    preserveViewport: true
+  });
 
   //adds/removes types from the seach options object when boxes clicked
-  $("input[type=checkbox]").on("change", function(){
+  $(".option-checkbox").on("change", function(){
     var option = $(this).val();
     if($(this).is(":checked")){
-      mapObject.searchOptions.type.push(option);
+      mapObject.searchOptions.types.push(option);
+      console.log("added " + option + " type");
+      console.log(mapObject.searchOptions.types);
     } else {
-      var index = mapObject.searchOptions.type.indexOf(option);
-      mapObject.searchOptions.type.splice(index,index+1);
+      var index = mapObject.searchOptions.types.indexOf(option);
+      mapObject.searchOptions.types.splice(index,index+1);
     }
   });
 
@@ -130,29 +149,69 @@ google.maps.event.addDomListener(window,'load',function() {
   $(".search").on("submit", function(event){
     //preventDefault stops a new page from loading
     event.preventDefault();
-    searchDistance = $("#distances").val();
+    mapObject.searchDistance = $("#distances").val() * kilometersPerMile;
+    mapObject.searchOptions.keywords = ($("#keyword").val());
+
     console.log("Search from: " + $("#start").val());
     console.log("Search to: "   + $("#destination").val());
-    console.log("Distance to search from route " + searchDistance);
+    console.log("Distance to search from route " + mapObject.searchDistance + "kms");
+
+    zoomMapObject.places.clearPlaces();
 
     calcRoute($("#start").val(), $("#destination").val(), function(res){
       //paint the route to the map
       paintRoute(res, mapObject.routeRenderer);
-      mapObject.places.clearPlaces();
+      paintRoute(res, zoomMapObject.routeRenderer);
 
       //gets first 10 miles of directions path
       var placesPathSegment = polylineMileSplit(parseFullPath(res.routes[0]), 0, 10);
 
-      var bboxArray = polylineToBBox(placesPathSegment, searchDistance);
+      var bboxArray = polylineToBBox(placesPathSegment, mapObject.searchDistance);
 
       var placesReqArray = bboxToPlacesReqArr(bboxArray, mapObject.searchOptions, mapObject.map);
 
       executePlacesReqArr(placesReqArray, function (result) {
         _.each(result, function (placeJSON) {
-          mapObject.places.addPlace(placeJSON, mapObject.map);
+          zoomMapObject.places.addPlace(placeJSON, zoomMapObject);
         });
-        //fix this, this will re-paint the entire places array
-        mapObject.places.paintMarkers(mapObject.map);
+      });
+
+      //combine all of bboxArray into one bbox that will be start viewport
+      var oneBBOX = new google.maps.LatLngBounds(bboxArray[0].getSouthWest(),
+            bboxArray[0].getNorthEast());
+
+      var oneBBOX = bboxArray[0];
+      _.each(bboxArray, function (bbox) {
+        oneBBOX.extend(bbox.getNorthEast());
+        oneBBOX.extend(bbox.getSouthWest());
+      });
+
+      zoomMapObject.map.fitBounds(oneBBOX);
+      zoomMapObject.map.setCenter(placesPathSegment[0]);
+      zoomMapObject.map.setZoom(11);
+
+     var rectangle = new google.maps.Rectangle({
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35,
+        map: zoomMapObject.map,
+        bounds: oneBBOX
+      });
+
+      indexMarker = new google.maps.Marker({
+
+          // for now, just get the name and location
+          position: placesPathSegment[0],
+          map: mapObject.map,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 10,
+            strokeWeight: 1,
+            fillOpacity: 1,
+            fillColor: "red"
+          }
       });
 
     }, mapObject.map);
@@ -178,8 +237,14 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 	var service = new google.maps.places.PlacesService(map);
 
 	var reqArr = [];
-
+	for(var j in options){
+		console.log(j + options[j]);
+	}
 	console.log("BBOXES:" + bboxArray.length);
+	var reqOptions = {
+		types: options["types"],
+		keyword: options["keywords"]
+	};
 
 	var i;
 	for (i=0; i<bboxArray.length; i++) {
@@ -190,12 +255,7 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 		// });
 
 		var req = (function() {
-			var reqOptions = {
-				bounds: bboxArray[i],
-				types: ["food"],
-				keyword: "mexican"
-
-			};
+			reqOptions.bounds = bboxArray[i];
 
 			return function(callback) {
 
