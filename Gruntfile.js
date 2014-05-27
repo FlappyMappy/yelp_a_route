@@ -39,7 +39,8 @@ module.exports = function (grunt) {
             },
 
             html: {
-                files: '<%= copy.all.src %>'
+                files: ['app/*.html', 'app/*.css'],
+                tasks: ['copy']
             },
 
             js: {

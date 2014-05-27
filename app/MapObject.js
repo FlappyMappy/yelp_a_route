@@ -14,4 +14,5 @@ module.exports = function mapObject (mapElement, mapOptions) {
     types: [],
     keywords: ""
   };
+  this.openInfoWindow = null;
 };
