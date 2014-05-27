@@ -9,38 +9,30 @@
 </head>
 
 <body>
-  <header class = "top-bar">
-    FlappyMappy!
+  <header class = "top-bar">Flappy Mappy
+          <button type="button" id="new-route-button">New Route</button>
   </header>
 
-  <div class = "content-row">
+  <div class = "map-container">
+    <div class = "zoom-map" id = "zoom-map-canvas"></div>
+    <div class = "index-map" id = "index-map-canvas"></div>
+  </div>
 
-    <div class = "map-container">
-      <div class = "zoom-map" id = "zoom-map-canvas"></div>
-      <div class = "index-map" id = "index-map-canvas"></div>
-    </div>
-
-    <div class = "right-column">
-
-      <div id="route-box" class = "box">
-
-        <form type = "POST" class = "search">
-          <div class = "inputs">
-            <div id = "a" class= "letter">A</div>
-            <input type = "text" id="start" class = "search-box" placeholder = "Where From?" value = "seattle" required>
-            <br><br>
-            <div id = "b" class="letter">B</div>
-            <input type = "text" id="destination" class = "search-box" placeholder = "Where To?" value = "lynnwood" required>
-          </div>
-          <div id = "route-button-wrapper">
-            <button id = "route-button">New Route</button>
-          </div>
-        </form>
-
-      </div>
-      <section class="options-panel box">
-        <input id="options" type="checkbox" />
-        <label for="options">Options</label>
+  <div id="route-box" class = "map-container popup-search">
+    <div class = "popup-search-box">
+      <form type = "POST" class = "search">
+        <div class = "inputs">
+          <div id = "a" class= "letter">A</div>
+          <input type = "text" id="start" class = "search-box" placeholder = "Where From?" value = "seattle" required>
+          <br><br>
+          <div id = "b" class="letter">B</div>
+          <input type = "text" id="destination" class = "search-box" placeholder = "Where To?" value = "lynnwood" required>
+        </div>
+        <div id = "route-button-wrapper">
+          <button id = "route-button">New Route</button>
+        </div>
+      </form>
+      <section class="options-panel">
         <article>
           Search
           <select id="distances">
@@ -59,13 +51,10 @@
           <input type="text" id="keyword" class="search-box" value="" placeholder="Restaurants, Pet Shops, etc.">
         </article>
       </section>
-
-      <div id="list-box" class = "box">
-        <div class = "list-display">
-          LIST BOX
-        </div>
-      </div>
     </div>
+  </div>
+  <div id="places-list" class =  "right-column">
+
   </div>
 
   <div class="bottom">
