@@ -57,6 +57,7 @@ google.maps.event.addDomListener(window,'load',function() {
     }
   });
 
+
   //empties search box when clicked
   $("#new-route-button").on("click", function(){
         $('#route-box').removeClass('hide');
