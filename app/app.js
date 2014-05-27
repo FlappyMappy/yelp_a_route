@@ -12,7 +12,7 @@ var bboxToPlacesReqArr = require('./bboxToPlacesReqArr');
 var polylineMileSplit = require('./polylineMileSplit');
 var executePlacesReqArr = require('./executePlacesReqArr');
 var placesDetailRequest = require('./placesDetailRequest');
-
+var kilometersPerMile = 1.6;
 
 google.maps.event.addDomListener(window,'load',function() {
 
@@ -45,13 +45,15 @@ google.maps.event.addDomListener(window,'load',function() {
   });
 
   //adds/removes types from the seach options object when boxes clicked
-  $("input[type=checkbox]").on("change", function(){
+  $(".option-checkbox").on("change", function(){
     var option = $(this).val();
     if($(this).is(":checked")){
-      mapObject.searchOptions.type.push(option);
+      mapObject.searchOptions.types.push(option);
+      console.log("added " + option + " type");
+      console.log(mapObject.searchOptions.types);
     } else {
-      var index = mapObject.searchOptions.type.indexOf(option);
-      mapObject.searchOptions.type.splice(index,index+1);
+      var index = mapObject.searchOptions.types.indexOf(option);
+      mapObject.searchOptions.types.splice(index,index+1);
     }
   });
 
@@ -64,10 +66,12 @@ google.maps.event.addDomListener(window,'load',function() {
   $(".search").on("submit", function(event){
     //preventDefault stops a new page from loading
     event.preventDefault();
-    searchDistance = $("#distances").val();
+    mapObject.searchDistance = $("#distances").val() * kilometersPerMile;
+    mapObject.searchOptions.keywords = ($("#keyword").val());
+
     console.log("Search from: " + $("#start").val());
     console.log("Search to: "   + $("#destination").val());
-    console.log("Distance to search from route " + searchDistance);
+    console.log("Distance to search from route " + mapObject.searchDistance + "kms");
 
     zoomMapObject.places.clearPlaces();
 
@@ -79,7 +83,7 @@ google.maps.event.addDomListener(window,'load',function() {
       //gets first 10 miles of directions path
       var placesPathSegment = polylineMileSplit(parseFullPath(res.routes[0]), 0, 10);
 
-      var bboxArray = polylineToBBox(placesPathSegment, searchDistance);
+      var bboxArray = polylineToBBox(placesPathSegment, mapObject.searchDistance);
 
       var placesReqArray = bboxToPlacesReqArr(bboxArray, mapObject.searchOptions, mapObject.map);
 

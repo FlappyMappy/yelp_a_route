@@ -15,8 +15,14 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 	var service = new google.maps.places.PlacesService(map);
 
 	var reqArr = [];
-
+	for(var j in options){
+		console.log(j + options[j]);
+	}
 	console.log("BBOXES:" + bboxArray.length);
+	var reqOptions = {
+		types: options["types"],
+		keyword: options["keywords"]
+	};
 
 	var i;
 	for (i=0; i<bboxArray.length; i++) {
@@ -27,12 +33,7 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 		// });
 
 		var req = (function() {
-			var reqOptions = {
-				bounds: bboxArray[i],
-				types: ["food"],
-				keyword: "mexican"
-
-			};
+			reqOptions.bounds = bboxArray[i];
 
 			return function(callback) {
 

@@ -26,3 +26,4 @@ node_modules
 
 app/bower_components
 https
+dist
