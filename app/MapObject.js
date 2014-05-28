@@ -12,7 +12,10 @@ module.exports = function mapObject (mapElement, mapOptions) {
   this.searchDistance = 2;
   this.searchOptions = {
     types: [],
-    keywords: ""
+    keywords: "",
+    openNow: false,
+    minPriceLevel: 0,
+    maxPriceLevel: 4
   };
   this.openInfoWindow = null;
 };

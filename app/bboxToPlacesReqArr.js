@@ -26,7 +26,10 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 		var req = (function() {
 			var reqOptions = {
 				types: options.types,
-				keyword: options.keyword
+				keyword: options.keyword,
+				openNow: options.openNow,
+				minPriceLevel: options.minPriceLevel,
+				maxPriceLevel: options.maxPriceLevel
 			};
 
 			reqOptions.bounds = bboxArray[i];
