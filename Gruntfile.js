@@ -14,7 +14,7 @@ module.exports = function (grunt) {
             all: {
                 expand: true,
                 cwd: 'app/',
-                src: ['*.css', '*.html', '/images/**/*', '!Gruntfile.js'],
+                src: ['*.css', '*.html', 'images/**/*', '!Gruntfile.js'],
                 dest: 'dist/',
                 flatten: true,
                 filter: 'isFile'
@@ -31,7 +31,7 @@ module.exports = function (grunt) {
                 dest: 'test/front-end/test-suite.js',
             },
             options: {
-                transform: ['debowerify'],
+                transform: ['debowerify', 'hbsfy'],
                 debug: true
             }
         },
@@ -45,7 +45,8 @@ module.exports = function (grunt) {
             },
 
             html: {
-                files: '<%= copy.all.src %>'
+                files: ['app/*.html', 'app/*.css'],
+                tasks: ['copy']
             },
 
             js: {
@@ -53,10 +54,6 @@ module.exports = function (grunt) {
                 tasks: ['browserify']
             },
 
-            assets: {
-                files: ['*.css', 'images/**/*', 'img/**/*', '!Gruntfile.js'],
-                tasks: ['copy']
-            }
         },
 
         jshint: {

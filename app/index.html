@@ -1,48 +1,90 @@
+<!doctype html>
+
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Yelp a Route</title>
-      <style type="text/css">
-        html { height: 100% }
-        body { height: 100%; margin: 0; padding: 0; background-color: #4F4F4F}
-        #map-canvas { height: 500px }
-        header {}
-    </style>
-  </head>
-  <body>
-    <div class="my-content">
-    <p>
-      <h1>Along the Way</h1>
-    </p>
-    </div>
-    <header>
-      <form type="POST" class="search">
-        <div class="search-boxes">
-          Start: <input id="start" class="search-box" placeholder="Seattle, WA" autofocus required>
-          Destination <input id="destination" class="search-box" placeholder="San Francisco, CA"required>
-          <button>Search</button>
-        <div class="options">
-          Food <input type="checkbox" class="food-checkbox" value="food">
-          Gas <input type="checkbox"  class="gas-checkbox" value="gas_station">
-          Shopping <input type="checkbox" class="shopping-checkbox" value="store">
-          Distance:
-          <select id="distances">
-            <option value="1">1</option>
-            <option value="2" selected>2</option>
-            <option value="5">5</option>
-            <option value="10">10</option>
+
+<head>
+  <title>FlappyMappy!</title>
+  <meta charset="UTF-8">
+  <link rel = "stylesheet" type = "text/css" href = "index.css"></style>
+</head>
+
+<body>
+  <header class = "top-bar">Flappy Mappy
+    <button type="button" id="new-route-button">New Route</button>
+  </header>
+
+  <div class = "map-container">
+    <div class = "zoom-map" id = "zoom-map-canvas"></div>
+    <div class = "index-map" id = "index-map-canvas"></div>
+  </div>
+
+  <div id="route-box" class = "map-container popup-search">
+    <form class = "search">
+      <div class = "inputs">
+        <div id = "a" class= "letter">A</div>
+        <input type = "text" id="start" class = "search-box" placeholder = "Where From?" value = "seattle" required>
+        <br><br>
+        <div id = "b" class="letter">B</div>
+        <input type = "text" id="destination" class = "search-box" placeholder = "Where To?" value = "lynnwood" required>
+      </div>
+      <div id = "route-button-wrapper">
+        <button id = "route-button">New Route</button>
+      </div>
+    </form>
+    <section class="options-panel">
+      <article>
+        Search for<br>
+        <input type="text" id="keyword" class="search-box" value="" placeholder="Restaurants, Pet Shops, etc."><br>
+        within
+        <select id="distances">
+          <option value="0.5">0.5</option>
+          <option value="1">1</option>
+          <option value="2" selected>2</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+        </select>
+        miles from route<br>
+        <hr/>
+        <div id="left-options-box">
+          <div id="types">
+            <input type="checkbox" id="food-checkbox" class="option-checkbox" value="food">Food<br>
+            <input type="checkbox"  id="gas-checkbox" class="option-checkbox" value="gas_station">Gas<br>
+            <input type="checkbox" id="shopping-checkbox" class="option-checkbox" value="store">Shopping
+          </div>
+        </div>
+        <div id="right-options-box">
+          Open now <input type="checkbox" id="open-checkbox" value="openNow"><br>
+          Price: <br>
+          <select id="min-price">
+          <option value="0" selected></option>
+            <option value="1">$</option>
+            <option value="2">$$</option>
+            <option value="3">$$$</option>
+            <option value="4">$$$$</option>
+          </select>
+          to
+          <select id="max-price">
+            <option value="0"></option>
+            <option value="1">$</option>
+            <option value="2" selected>$$</option>
+            <option value="3">$$$</option>
+            <option value="4">$$$$</option>
           </select>
         </div>
-      </form>
-    </header>
+      </article>
+    </section>
+  </div>
+  <div id="places-list" class =  "right-column">
 
-    <sidebar id="list-view">
-    </sidebar>
+  </div>
 
-    <div id = "map-canvas"></div>
-    <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization,places&key=AIzaSyA7tOZNjgHPNh5a-zL1Mo9EFIysbwUU4s4&sensor=false"></script>
-    <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/routeboxer/src/RouteBoxer.js"></script>
-    <script src = "app.js"></script>
+  <div class="bottom">
+    Team FlappyMappy, 2014
+  </div>
 
-  </body>
+  <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization,places&key=AIzaSyA7tOZNjgHPNh5a-zL1Mo9EFIysbwUU4s4&sensor=false"></script>
+  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/routeboxer/src/RouteBoxer.js"></script>
+  <script src = "app.js"></script>
+
+</body>
 </html>
