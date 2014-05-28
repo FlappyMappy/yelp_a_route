@@ -22,16 +22,22 @@ module.exports = function (grunt) {
         },
 
         browserify: {
-            all: {
+            standalone: {
                 src: 'app/*.js',
                 dest: 'dist/app.js'
+            },
+            test: {
+                src: ['test/front-end/unit/**/*.js'],
+                dest: 'test/front-end/test-suite.js',
             },
             options: {
                 transform: ['debowerify', 'hbsfy'],
                 debug: true
             }
         },
-
+        simplemocha: {
+            all: 'test/front-end/test-suite.js'
+        },
 
         watch: {
             options: {
@@ -44,7 +50,7 @@ module.exports = function (grunt) {
             },
 
             js: {
-                files: '<%= browserify.all.src %>',
+                files: '<%= browserify.standalone.src %>',
                 tasks: ['browserify']
             },
 
@@ -70,7 +76,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('server', ['express:dev', 'build', 'watch']);
     grunt.registerTask('serve', ['server']);
-    grunt.registerTask('test', ['jshint']);
-    grunt.registerTask('build', ['clean', 'browserify', 'copy']);
+    grunt.registerTask('test', ['browserify:test', 'simplemocha', 'jshint']);
+    grunt.registerTask('build', ['clean', 'browserify:standalone', 'copy']);
 
 };

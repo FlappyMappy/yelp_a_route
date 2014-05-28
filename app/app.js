@@ -16,31 +16,15 @@ var kilometersPerMile = 1.6;
 
 google.maps.event.addDomListener(window,'load',function() {
 
-
-  var mapObject = new MapObject(document.getElementById("index-map-canvas"),
-    {
-       center: new google.maps.LatLng( 39.8,-98.6),
-       zoom: 4,
-       disableDefaultUI: true
-    }
-  );
-
-  mapObject.routeRenderer.setOptions({
-    suppressMarkers: true,
-    polylineOptions: {
-      strokeColor: 'black'
-    }
-  });
-
-
-  var zoomMapObject = new MapObject(document.getElementById("zoom-map-canvas"),
+  //create instance of our global object
+  var mapObject = new MapObject(document.getElementById("zoom-map-canvas"),
     {
        center: new google.maps.LatLng( 39.8,-98.6),
        zoom: 4
     }
   );
 
-  zoomMapObject.routeRenderer.setOptions({
+  mapObject.routeRenderer.setOptions({
     preserveViewport: true
   });
 
@@ -88,22 +72,16 @@ google.maps.event.addDomListener(window,'load',function() {
     mapObject.searchOptions.openNow = $("#open-checkbox").is(":checked") ? true : false;
     mapObject.searchOptions.minPriceLevel = $("#min-price").val();
     mapObject.searchOptions.maxPriceLevel = $("#max-price").val();
-    console.log("Search from: " + $("#start").val());
-    console.log("Search to: "   + $("#destination").val());
-    console.log("Distance to search from route " + mapObject.searchDistance + "kms");
-    console.log("opennow set to " + mapObject.searchOptions.openNow );
-    console.log("Min price set to " + mapObject.searchOptions.minPriceLevel);
-    console.log("Max price set to " + mapObject.searchOptions.maxPriceLevel);
+
 
     $('#route-box').addClass('hide');
 
-    zoomMapObject.places.clearPlaces();
+    mapObject.places.clearPlaces();
 
     calcRoute($("#start").val(), $("#destination").val(), function(res){
       //paint the route to the map
       console.dir(res);
       paintRoute(res, mapObject.routeRenderer);
-      paintRoute(res, zoomMapObject.routeRenderer);
 
       //gets first 10 miles of directions path
       var placesPathSegment = polylineMileSplit(parseFullPath(res.routes[0]), 0, 10);
@@ -114,7 +92,7 @@ google.maps.event.addDomListener(window,'load',function() {
 
       executePlacesReqArr(placesReqArray, function (result) {
         _.each(result, function (placeJSON) {
-          zoomMapObject.places.addPlace(placeJSON, zoomMapObject);
+          mapObject.places.addPlace(placeJSON, mapObject);
         });
       });
 
@@ -128,23 +106,9 @@ google.maps.event.addDomListener(window,'load',function() {
         oneBBOX.extend(bbox.getSouthWest());
       });
 
-      zoomMapObject.map.fitBounds(oneBBOX);
-      zoomMapObject.map.setCenter(placesPathSegment[0]);
-      zoomMapObject.map.setZoom(11);
-
-      indexMarker = new google.maps.Marker({
-
-          // for now, just get the name and location
-          position: placesPathSegment[0],
-          map: mapObject.map,
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            strokeWeight: 1,
-            fillOpacity: 1,
-            fillColor: "red"
-          }
-      });
+      mapObject.map.fitBounds(oneBBOX);
+      mapObject.map.setCenter(placesPathSegment[0]);
+      mapObject.map.setZoom(11);
 
     }, mapObject.map);
 

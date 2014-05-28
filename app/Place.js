@@ -1,6 +1,7 @@
 var placesDetailRequest = require('./placesDetailRequest');
 var _ = require('underscore');
 var template = require('./template.hbs');
+var $ = require ("jquery");
 
 module.exports = function Place (placeJSON, mapObject) {
   var that = this;
@@ -21,7 +22,12 @@ module.exports = function Place (placeJSON, mapObject) {
       }
     });
 
-  google.maps.event.addListener(this.marker, 'click', function() {
+// add each place to the list display
+$(".list-display").append ("<span class='place_name' id='"
+                           + placeJSON.reference + "'>"
+                           + placeJSON.name + "</span><br><hr>");
+
+google.maps.event.addListener(this.marker, 'click', function() {
 
     if (mapObject.openInfoWindow!==null){
       mapObject.openInfoWindow.close();
