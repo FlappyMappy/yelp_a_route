@@ -172,6 +172,24 @@ input.search-box
   padding-left: 5px;
 }
 
+input#keyword
+{
+  width: 336px;
+  margin: 10px 0px 10px 0px;
+}
+
+div#left-options-box
+{
+  float: left;
+  width: 150px;
+}
+
+div#right-options-box
+{
+  float: right;
+  width: 150px;
+}
+
 div.list-display
 {
   background-color: white;
