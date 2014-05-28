@@ -45,13 +45,13 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 					} else {
 
 						throw("BBox to Places request failed:" + status);
-					};
+					}
 				});
 			};
 		})();
 
 		reqArr.push(req);
-	};
+	}
 
 	return reqArr;
 };

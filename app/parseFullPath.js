@@ -6,14 +6,14 @@
 //returns - a high resolution path polyline
 
 module.exports = function parseFullPath(route) {
-	
+
 	var fullPath = [];
 
 	route.legs.forEach(function(leg){
 		leg.steps.forEach(function(step){
 			step.lat_lngs.forEach(function(point){
 				fullPath.push(point);
-			})
+			});
 		});
 	});
 
