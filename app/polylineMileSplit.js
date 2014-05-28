@@ -1,5 +1,5 @@
 //This function will take a polyline and return a polyline
-//that starts at mile startMile and ends at 
+//that starts at mile startMile and ends at
 //endMile
 
 var milesToMeters = require('./milesToMeters');
@@ -23,8 +23,8 @@ module.exports = function polylineMileSplit(polyline, startMile, endMile){
 				newPolyline.push(polyline[i]);
 			} else {
 				return newPolyline;
-			};
-		};
-	};
+			}
+		}
+	}
 	return newPolyline;
 };

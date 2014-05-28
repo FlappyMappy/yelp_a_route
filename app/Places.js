@@ -1,5 +1,6 @@
 var _ = require ('underscore');
 var Place = require('./Place');
+var $ = require ("jquery");
 
 module.exports = function Places () {
   this.places = [];
@@ -14,6 +15,9 @@ module.exports = function Places () {
     };
 
     this.places = [];
+
+  // clear the list display div for each search
+  $(".list-display").empty();
   };
 
   this.addPlace = function addPlace (placeJSON, mapObject) {

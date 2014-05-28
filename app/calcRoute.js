@@ -16,7 +16,8 @@ module.exports = function calcRoute(start, end, callback, map) {
             callback(result);
         } else {
             throw "Route request failed";
-        };
+        }
     });
 };
+
 

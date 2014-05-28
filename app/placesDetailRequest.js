@@ -14,7 +14,7 @@ module.exports = function placesDetailRequest(placeID, map, callback) {
 
 				} else {
 					console.log("placesDetailRequest Error:" + status);
-				};
+				}
 			}
 	);
 
