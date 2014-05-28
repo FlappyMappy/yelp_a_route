@@ -45,13 +45,13 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 					} else {
 
 						throw("BBox to Places request failed:" + status);
-					};
+					}
 				});
 			};
-		})(); //what are the parens for?
+		})(); //JSHINT: Don't make funcions within a loop.
 
 		reqArr.push(req);
-	};
+	}
 
 	return reqArr;
 };

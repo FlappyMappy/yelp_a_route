@@ -6,9 +6,9 @@ module.exports = function polylineToBBox(polyline, dist){
 
     if (dist<=0){
         throw "Distance must be greater than 0 KM";
-    } else if (!polyline.length>0){
+    } else if (!polyline.length>0){  ///JSHINT: Confusing use of !
         throw "Polyline has no points";
-    };
+    }
 
-    return (new RouteBoxer).box(polyline, dist);
+    return (new RouteBoxer).box(polyline, dist); //JSHINT: missing () invoking a constructor
 };
