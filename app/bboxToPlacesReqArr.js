@@ -15,10 +15,6 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 	var service = new google.maps.places.PlacesService(map);
 
 	var reqArr = [];
-	for(var j in options){
-		console.log(j + options[j]);
-	}
-	console.log("BBOXES:" + bboxArray.length);
 
 	var i;
 	for (i=0; i<bboxArray.length; i++) {
@@ -35,7 +31,7 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 			reqOptions.bounds = bboxArray[i];
 
 			return function(callback) {
-				console.dir(reqOptions.bounds);
+
 				service.nearbySearch(reqOptions, function(result, status, pagination) {
 
 					if (status == google.maps.places.PlacesServiceStatus.OK){
