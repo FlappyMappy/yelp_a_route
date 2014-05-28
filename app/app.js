@@ -87,16 +87,7 @@ google.maps.event.addDomListener(window,'load',function() {
       });
 
       //combine all of bboxArray into one bbox that will be start viewport
-      var oneBBOX = new google.maps.LatLngBounds(bboxArray[0].getSouthWest(),
-            bboxArray[0].getNorthEast());
 
-      var oneBBOX = bboxArray[0];
-      _.each(bboxArray, function (bbox) {
-        oneBBOX.extend(bbox.getNorthEast());
-        oneBBOX.extend(bbox.getSouthWest());
-      });
-
-      mapObject.map.fitBounds(oneBBOX);
       mapObject.map.setCenter(placesPathSegment[0]);
       mapObject.map.setZoom(11);
 
