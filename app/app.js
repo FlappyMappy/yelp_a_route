@@ -44,23 +44,30 @@ google.maps.event.addDomListener(window,'load',function() {
     preserveViewport: true
   });
 
-  //adds/removes types from the seach options object when boxes clicked
+  //adds/removes types from the search options object when boxes clicked
   $(".option-checkbox").on("change", function(){
     var option = $(this).val();
     if($(this).is(":checked")){
       mapObject.searchOptions.types.push(option);
       console.log("added " + option + " type");
-      console.log(mapObject.searchOptions.types);
     } else {
       var index = mapObject.searchOptions.types.indexOf(option);
       mapObject.searchOptions.types.splice(index,index+1);
     }
   });
 
+  //ensures min price is never greater than max
+  $("#min-price").on('change', function(){
+    var min = $(this).val();
+    var max = $("#max-price").val();
+    if(min > max){
+      $("#max-price").val(min);
+    }
+  });
 
-  //empties search box when clicked
+  //restores main searchbox when clicked
   $("#new-route-button").on("click", function(){
-        $('#route-box').removeClass('hide');
+    $('#route-box').removeClass('hide');
   });
 
   //starts route search based on search boxes when submit button clicked
@@ -68,11 +75,16 @@ google.maps.event.addDomListener(window,'load',function() {
     //preventDefault stops a new page from loading
     event.preventDefault();
     mapObject.searchDistance = $("#distances").val() * kilometersPerMile;
-    mapObject.searchOptions.keyword = ($("#keyword").val());
-
+    mapObject.searchOptions.keyword = $("#keyword").val();
+    mapObject.searchOptions.openNow = $("#open-checkbox").is(":checked") ? true : false;
+    mapObject.searchOptions.minPriceLevel = $("#min-price").val();
+    mapObject.searchOptions.maxPriceLevel = $("#max-price").val();
     console.log("Search from: " + $("#start").val());
     console.log("Search to: "   + $("#destination").val());
     console.log("Distance to search from route " + mapObject.searchDistance + "kms");
+    console.log("opennow set to " + mapObject.searchOptions.openNow );
+    console.log("Min price set to " + mapObject.searchOptions.minPriceLevel);
+    console.log("Max price set to " + mapObject.searchOptions.maxPriceLevel);
 
     $('#route-box').addClass('hide');
 
