@@ -155,7 +155,7 @@ div #route-button-wrapper
   text-align: center;
   font-size: 20pt;
   font-weight: bold;
-  float: left;//right;
+  float: none;
   border-radius: 10px;
   border: none;
   width: 110px;
@@ -167,6 +167,7 @@ div #route-button-wrapper
 input.search-box
 {
   height: 40px;
+  width: 195px;
   box-shadow: 5px 5px 5px rgba(0, 0, 0, .75);
   font-size: 16px;
   padding-left: 5px;
