@@ -51,7 +51,7 @@ module.exports = function (grunt) {
 
             js: {
                 files: '<%= browserify.standalone.src %>',
-                tasks: ['browserify']
+                tasks: ['browserify:standalone']
             },
 
         },
