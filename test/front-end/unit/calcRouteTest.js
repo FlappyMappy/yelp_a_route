@@ -11,15 +11,13 @@ describe("CalcRoute", function() {
   before(function(done){
     mapObject = new MapObject(element);
     callback = function (res) {
-      console.dir(res);
       result = res;
-      done();
+        done();
     };
     calcRoute("seattle", "tacoma", callback, mapObject.map);
   });
 
   it('return is an object', function() {
-    // console.dir(result);
     expect(result).to.be.an("object");
   });
 
