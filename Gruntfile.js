@@ -5,7 +5,7 @@ module.exports = function (grunt) {
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
     grunt.initConfig({
-    
+
         pkg: grunt.file.readJSON('package.json'),
 
         clean: ['dist'],
@@ -22,16 +22,22 @@ module.exports = function (grunt) {
         },
 
         browserify: {
-            all: {
+            standalone: {
                 src: 'app/*.js',
                 dest: 'dist/app.js'
+            },
+            test: {
+                src: ['test/front-end/unit/**/*.js'],
+                dest: 'test/front-end/test-suite.js',
             },
             options: {
                 transform: ['debowerify'],
                 debug: true
             }
         },
-
+        simplemocha: {
+            all: 'test/front-end/test-suite.js'
+        },
 
         watch: {
             options: {
@@ -73,7 +79,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('server', ['express:dev', 'build', 'watch']);
     grunt.registerTask('serve', ['server']);
-    grunt.registerTask('test', ['jshint']);
+    grunt.registerTask('test', ['jshint', 'browserify:test', 'simplemocha']);
     grunt.registerTask('build', ['clean', 'browserify', 'copy']);
-    
+
 };
