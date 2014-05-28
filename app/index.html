@@ -9,8 +9,9 @@
 </head>
 
 <body>
-  <header class = "top-bar">Flappy Mappy
+  <header class = "top-bar">
     <button type="button" id="new-route-button">New Route</button>
+    Flappy Mappy
   </header>
 
   <div class = "map-container">
@@ -74,17 +75,25 @@
       </article>
     </section>
   </div>
-  <div id="places-list" class =  "right-column">
 
+  <div id="list-box" class = "box">
+    <div class = "places_label">Places</div>
+    <div class = "list-display">
+      <span class="friendly_text">
+        Enter a trip on the left.<br>
+        <br>
+        I'll show you places along the way!
+      </span>
+    </div>
   </div>
 
   <div class="bottom">
     Team FlappyMappy, 2014
   </div>
 
-  <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization,places&key=AIzaSyA7tOZNjgHPNh5a-zL1Mo9EFIysbwUU4s4&sensor=false"></script>
-  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/routeboxer/src/RouteBoxer.js"></script>
-  <script src = "app.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization,places&key=AIzaSyA7tOZNjgHPNh5a-zL1Mo9EFIysbwUU4s4&sensor=false"></script>
+    <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/routeboxer/src/RouteBoxer.js"></script>
+    <script src = "app.js"></script>
 
-</body>
+  </body>
 </html>
