@@ -21,22 +21,21 @@ module.exports = function Place (placeJSON, mapObject) {
       }
     });
 
-google.maps.event.addListener(this.marker, 'click', function() {
+  google.maps.event.addListener(this.marker, 'click', function() {
 
-  if (mapObject.openInfoWindow!==null){
-    mapObject.openInfoWindow.close();
-    console.log("closing info");
-  };
-  console.dir(placeJSON.reference);
-  placesDetailRequest(placeJSON.reference, mapObject.map, function(result){
-    console.dir(result);
-    console.dir(template(result));
-    that.infoWindow = new google.maps.InfoWindow({
-      content: template(result)
+    if (mapObject.openInfoWindow!==null){
+      mapObject.openInfoWindow.close();
+      console.log("closing info");
+    };
+    console.dir(placeJSON.reference);
+    placesDetailRequest(placeJSON.reference, mapObject.map, function(result){
+      console.dir(result);
+      console.dir(template(result));
+      that.infoWindow = new google.maps.InfoWindow({
+        content: template(result)
+      });
+      mapObject.openInfoWindow = that.infoWindow;
+      mapObject.openInfoWindow.open(mapObject.map, that.marker);
     });
-    mapObject.openInfoWindow = that.infoWindow;
-    mapObject.openInfoWindow.open(mapObject.map, that.marker);
   });
-
-});
 };

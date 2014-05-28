@@ -57,11 +57,20 @@ google.maps.event.addDomListener(window,'load',function() {
   });
 
   //ensures min price is never greater than max
-  $("#min-price").on('change', function(){
+  $("#min-price").on("change", function(){
     var min = $(this).val();
     var max = $("#max-price").val();
     if(min > max){
       $("#max-price").val(min);
+    }
+  });
+
+  //ensures max price is never less than min
+  $("#max-price").on("change", function(){
+    var min = $("#min-price").val();
+    var max = $(this).val();
+    if(min > max){
+      $("#min-price").val(max);
     }
   });
 
@@ -92,6 +101,7 @@ google.maps.event.addDomListener(window,'load',function() {
 
     calcRoute($("#start").val(), $("#destination").val(), function(res){
       //paint the route to the map
+      console.dir(res);
       paintRoute(res, mapObject.routeRenderer);
       paintRoute(res, zoomMapObject.routeRenderer);
 
