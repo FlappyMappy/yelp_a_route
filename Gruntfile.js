@@ -51,8 +51,13 @@ module.exports = function (grunt) {
 
             js: {
                 files: '<%= browserify.standalone.src %>',
-                tasks: ['browserify']
+                tasks: ['browserify:standalone']
             },
+
+            testjs: {
+                files: '<%= browserify.test.src %>',
+                tasks: ['browserify:test']
+            }
 
         },
 
@@ -69,14 +74,14 @@ module.exports = function (grunt) {
                     background: true,
                     script: 'server.js'
                 }
-            }
+            },
         }
 
     });
 
     grunt.registerTask('server', ['express:dev', 'build', 'watch']);
     grunt.registerTask('serve', ['server']);
-    grunt.registerTask('test', ['browserify:test', 'simplemocha', 'jshint']);
+    grunt.registerTask('test', ['browserify:test', 'watch']);
     grunt.registerTask('build', ['clean', 'browserify:standalone', 'copy']);
 
 };

@@ -12,7 +12,7 @@ module.exports = function calcRoute(start, end, callback, map) {
         if (status == google.maps.DirectionsStatus.OK) {
 
             // map.fitBounds(result.routes[0].bounds);
-
+            console.dir("about to callback", result);
             callback(result);
         } else {
             throw "Route request failed";

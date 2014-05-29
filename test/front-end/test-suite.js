@@ -3,6 +3,8 @@ var Places = require('./Places');
 
 //One instance of this object will be created and it will hold
 //an array of places objects.
+//Within searchOptions, types is an array of strings,
+//keywords must be a string, but it may have several space-delimited values
 
 module.exports = function mapObject (mapElement, mapOptions) {
   this.map = new google.maps.Map(mapElement, mapOptions);
@@ -10,53 +12,60 @@ module.exports = function mapObject (mapElement, mapOptions) {
   this.places = new Places();
   this.searchDistance = 2;
   this.searchOptions = {
-    type: []
+    types: [],
+    keywords: "",
+    openNow: false,
+    minPriceLevel: 0,
+    maxPriceLevel: 4
   };
+  this.openInfoWindow = null;
 };
 
 },{"./Places":3}],2:[function(require,module,exports){
-module.exports = function Place (placeJSON, map) {
+var placesDetailRequest = require('./placesDetailRequest');
+var _ = require("./bower_components/underscore/underscore.js");
+var template = require('./template.hbs');
+
+module.exports = function Place (placeJSON, mapObject) {
+  var that = this;
   this.placeJSON = placeJSON;
-  this.infoWindow = null;
-  this.marker = null;
 
-  this.paintPlace = function paintPlace (map) {
+  this.marker = new google.maps.Marker({
 
-    var that = this;
-
-    this.marker = new google.maps.Marker({
-
-        // for now, just get the name and location
-        position: this.placeJSON.geometry.location,
-        title: this.placeJSON.name,
-        map: map,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 3,
-          strokeWeight: 1,
-          fillOpacity: 1,
-          fillColor: "red"
-        }
-      });
-
-    this.infoWindow = new google.maps.InfoWindow({
-      content: "<b>Name: </b>" + this.placeJSON.name
+      // for now, just get the name and location
+      position: this.placeJSON.geometry.location,
+      title: this.placeJSON.name,
+      map: mapObject.map,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 3,
+        strokeWeight: 1,
+        fillOpacity: 1,
+        fillColor: "red"
+      }
     });
 
-      //make info window close when the next one is opened
+google.maps.event.addListener(this.marker, 'click', function() {
 
-    google.maps.event.addListener(this.marker, 'click', function() {
-
-      that.infoWindow.open(map, that.marker);
-    });
-
-    this.setMap = function setMap (map) {
-      that.marker.setMap(null);
-    };
+  if (mapObject.openInfoWindow!==null){
+    mapObject.openInfoWindow.close();
+    console.log("closing info");
   };
+  console.dir(placeJSON.reference);
+  placesDetailRequest(placeJSON.reference, mapObject.map, function(result){
+    console.dir(result);
+    console.dir(template(result));
+    that.infoWindow = new google.maps.InfoWindow({
+      content: template(result)
+    });
+    mapObject.openInfoWindow = that.infoWindow;
+    mapObject.openInfoWindow.open(mapObject.map, that.marker);
+  });
+
+});
 };
 
-},{}],3:[function(require,module,exports){
+},{"./bower_components/underscore/underscore.js":4,"./placesDetailRequest":7,"./template.hbs":8}],3:[function(require,module,exports){
 var _ = require ("./bower_components/underscore/underscore.js");
 var Place = require('./Place');
 
@@ -65,21 +74,18 @@ module.exports = function Places () {
   var that = this;
 
   this.clearPlaces = function clearPlaces () {
-    _.each(that.places, function (place) {
-      place.marker.setMap(null);
-    });
+    
+    if (that.places.length>0){
+      _.each(that.places, function (place) {
+        place.marker.setMap(null);
+      });
+    };
 
     this.places = [];
   };
 
-  this.addPlace = function addPlace (placeJSON, map) {
-    this.places.push(new Place(placeJSON, map));
-  };
-
-  this.paintMarkers = function paintMarkers (map) {
-    _.each(this.places, function (placeInst) {
-      placeInst.paintPlace(map);
-    });
+  this.addPlace = function addPlace (placeJSON, mapObject) {
+    this.places.push(new Place(placeJSON, mapObject));
   };
 };
 
@@ -1443,7 +1449,7 @@ module.exports = function calcRoute(start, end, callback, map) {
         if (status == google.maps.DirectionsStatus.OK) {
 
             // map.fitBounds(result.routes[0].bounds);
-
+            console.dir("about to callback", result);
             callback(result);
         } else {
             throw "Route request failed";
@@ -1454,6 +1460,75 @@ module.exports = function calcRoute(start, end, callback, map) {
 
 
 },{}],6:[function(require,module,exports){
+
+//paint the route
+module.exports = function paintRoute (routes, routeRenderer) {
+  if(routeRenderer instanceof google.maps.DirectionsRenderer) {
+    routeRenderer.setDirections(routes);
+  }
+};
+
+},{}],7:[function(require,module,exports){
+//this method takes a unique places ID
+//and requests details from google maps
+//and passes results to callback
+
+module.exports = function placesDetailRequest(placeID, map, callback) {
+
+	(new google.maps.places.PlacesService(map)).getDetails({
+
+			reference: placeID
+		}, function (result, status) {
+				if (status === google.maps.DirectionsStatus.OK) {
+
+					callback(result);
+
+				} else {
+					console.log("placesDetailRequest Error:" + status);
+				}
+			}
+	);
+
+};
+
+},{}],8:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression;
+
+
+  buffer += "<b>";
+  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</b> <br>\n";
+  if (helper = helpers.formatted_address) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.formatted_address); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + " <br>\n<br>\n  <a href=\"";
+  if (helper = helpers.website) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.website); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" target=\"_newtab\">website</a> <br>\n  ";
+  if (helper = helpers.formatted_phone_number) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.formatted_phone_number); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + " <br>\n<br>\n  Rating: ";
+  if (helper = helpers.rating) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.rating); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "     <a href=\"";
+  if (helper = helpers.url) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.url); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" target=\"_newtab\">more info</a>\n";
+  return buffer;
+  });
+
+},{"hbsfy/runtime":51}],9:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -2603,7 +2678,7 @@ function assert (test, message) {
   if (!test) throw new Error(message || 'Failed assertion')
 }
 
-},{"base64-js":7,"ieee754":8}],7:[function(require,module,exports){
+},{"base64-js":10,"ieee754":11}],10:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -2726,7 +2801,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	module.exports.fromByteArray = uint8ToBase64
 }())
 
-},{}],8:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -2812,10 +2887,10 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}],9:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 module.exports = require('./lib/chai');
 
-},{"./lib/chai":10}],10:[function(require,module,exports){
+},{"./lib/chai":13}],13:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -2904,7 +2979,7 @@ exports.use(should);
 var assert = require('./chai/interface/assert');
 exports.use(assert);
 
-},{"./chai/assertion":11,"./chai/config":12,"./chai/core/assertions":13,"./chai/interface/assert":14,"./chai/interface/expect":15,"./chai/interface/should":16,"./chai/utils":27,"assertion-error":36}],11:[function(require,module,exports){
+},{"./chai/assertion":14,"./chai/config":15,"./chai/core/assertions":16,"./chai/interface/assert":17,"./chai/interface/expect":18,"./chai/interface/should":19,"./chai/utils":30,"assertion-error":39}],14:[function(require,module,exports){
 /*!
  * chai
  * http://chaijs.com
@@ -3036,7 +3111,7 @@ module.exports = function (_chai, util) {
   });
 };
 
-},{"./config":12}],12:[function(require,module,exports){
+},{"./config":15}],15:[function(require,module,exports){
 module.exports = {
 
   /**
@@ -3088,7 +3163,7 @@ module.exports = {
 
 };
 
-},{}],13:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /*!
  * chai
  * http://chaijs.com
@@ -4404,7 +4479,7 @@ module.exports = function (chai, _) {
   });
 };
 
-},{}],14:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5462,7 +5537,7 @@ module.exports = function (chai, util) {
   ('Throw', 'throws');
 };
 
-},{}],15:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5476,7 +5551,7 @@ module.exports = function (chai, util) {
 };
 
 
-},{}],16:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5556,7 +5631,7 @@ module.exports = function (chai, util) {
   chai.Should = loadShould;
 };
 
-},{}],17:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /*!
  * Chai - addChainingMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5669,7 +5744,7 @@ module.exports = function (ctx, name, method, chainingBehavior) {
   });
 };
 
-},{"../config":12,"./flag":20,"./transferFlags":34}],18:[function(require,module,exports){
+},{"../config":15,"./flag":23,"./transferFlags":37}],21:[function(require,module,exports){
 /*!
  * Chai - addMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5714,7 +5789,7 @@ module.exports = function (ctx, name, method) {
   };
 };
 
-},{"../config":12,"./flag":20}],19:[function(require,module,exports){
+},{"../config":15,"./flag":23}],22:[function(require,module,exports){
 /*!
  * Chai - addProperty utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5756,7 +5831,7 @@ module.exports = function (ctx, name, getter) {
   });
 };
 
-},{}],20:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /*!
  * Chai - flag utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5790,7 +5865,7 @@ module.exports = function (obj, key, value) {
   }
 };
 
-},{}],21:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /*!
  * Chai - getActual utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5810,7 +5885,7 @@ module.exports = function (obj, args) {
   return args.length > 4 ? args[4] : obj._obj;
 };
 
-},{}],22:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /*!
  * Chai - getEnumerableProperties utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5837,7 +5912,7 @@ module.exports = function getEnumerableProperties(object) {
   return result;
 };
 
-},{}],23:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /*!
  * Chai - message composition utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5888,7 +5963,7 @@ module.exports = function (obj, args) {
   return flagMsg ? flagMsg + ': ' + msg : msg;
 };
 
-},{"./flag":20,"./getActual":21,"./inspect":28,"./objDisplay":29}],24:[function(require,module,exports){
+},{"./flag":23,"./getActual":24,"./inspect":31,"./objDisplay":32}],27:[function(require,module,exports){
 /*!
  * Chai - getName utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -5910,7 +5985,7 @@ module.exports = function (func) {
   return match && match[1] ? match[1] : "";
 };
 
-},{}],25:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /*!
  * Chai - getPathValue utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6014,7 +6089,7 @@ function _getPathValue (parsed, obj) {
   return res;
 };
 
-},{}],26:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /*!
  * Chai - getProperties utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6051,7 +6126,7 @@ module.exports = function getProperties(object) {
   return result;
 };
 
-},{}],27:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /*!
  * chai
  * Copyright(c) 2011 Jake Luer <jake@alogicalparadox.com>
@@ -6167,7 +6242,7 @@ exports.addChainableMethod = require('./addChainableMethod');
 exports.overwriteChainableMethod = require('./overwriteChainableMethod');
 
 
-},{"./addChainableMethod":17,"./addMethod":18,"./addProperty":19,"./flag":20,"./getActual":21,"./getMessage":23,"./getName":24,"./getPathValue":25,"./inspect":28,"./objDisplay":29,"./overwriteChainableMethod":30,"./overwriteMethod":31,"./overwriteProperty":32,"./test":33,"./transferFlags":34,"./type":35,"deep-eql":37}],28:[function(require,module,exports){
+},{"./addChainableMethod":20,"./addMethod":21,"./addProperty":22,"./flag":23,"./getActual":24,"./getMessage":26,"./getName":27,"./getPathValue":28,"./inspect":31,"./objDisplay":32,"./overwriteChainableMethod":33,"./overwriteMethod":34,"./overwriteProperty":35,"./test":36,"./transferFlags":37,"./type":38,"deep-eql":40}],31:[function(require,module,exports){
 // This is (almost) directly from Node.js utils
 // https://github.com/joyent/node/blob/f8c335d0caf47f16d31413f89aa28eda3878e3aa/lib/util.js
 
@@ -6489,7 +6564,7 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 
-},{"./getEnumerableProperties":22,"./getName":24,"./getProperties":26}],29:[function(require,module,exports){
+},{"./getEnumerableProperties":25,"./getName":27,"./getProperties":29}],32:[function(require,module,exports){
 /*!
  * Chai - flag utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6540,7 +6615,7 @@ module.exports = function (obj) {
   }
 };
 
-},{"../config":12,"./inspect":28}],30:[function(require,module,exports){
+},{"../config":15,"./inspect":31}],33:[function(require,module,exports){
 /*!
  * Chai - overwriteChainableMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6595,7 +6670,7 @@ module.exports = function (ctx, name, method, chainingBehavior) {
   };
 };
 
-},{}],31:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 /*!
  * Chai - overwriteMethod utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6648,7 +6723,7 @@ module.exports = function (ctx, name, method) {
   }
 };
 
-},{}],32:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /*!
  * Chai - overwriteProperty utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6704,7 +6779,7 @@ module.exports = function (ctx, name, getter) {
   });
 };
 
-},{}],33:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 /*!
  * Chai - test utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6732,7 +6807,7 @@ module.exports = function (obj, args) {
   return negate ? !expr : expr;
 };
 
-},{"./flag":20}],34:[function(require,module,exports){
+},{"./flag":23}],37:[function(require,module,exports){
 /*!
  * Chai - transferFlags utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6778,7 +6853,7 @@ module.exports = function (assertion, object, includeAll) {
   }
 };
 
-},{}],35:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 /*!
  * Chai - type utility
  * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
@@ -6825,7 +6900,7 @@ module.exports = function (obj) {
   return typeof obj;
 };
 
-},{}],36:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 /*!
  * assertion-error
  * Copyright(c) 2013 Jake Luer <jake@qualiancy.com>
@@ -6937,10 +7012,10 @@ AssertionError.prototype.toJSON = function (stack) {
   return props;
 };
 
-},{}],37:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 module.exports = require('./lib/eql');
 
-},{"./lib/eql":38}],38:[function(require,module,exports){
+},{"./lib/eql":41}],41:[function(require,module,exports){
 /*!
  * deep-eql
  * Copyright(c) 2013 Jake Luer <jake@alogicalparadox.com>
@@ -7199,10 +7274,10 @@ function objectEqual(a, b, m) {
   return true;
 }
 
-},{"buffer":6,"type-detect":39}],39:[function(require,module,exports){
+},{"buffer":9,"type-detect":42}],42:[function(require,module,exports){
 module.exports = require('./lib/type');
 
-},{"./lib/type":40}],40:[function(require,module,exports){
+},{"./lib/type":43}],43:[function(require,module,exports){
 /*!
  * type-detect
  * Copyright(c) 2013 jake luer <jake@alogicalparadox.com>
@@ -7346,30 +7421,547 @@ Library.prototype.test = function (obj, type) {
   }
 };
 
-},{}],41:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
+"use strict";
+/*globals Handlebars: true */
+var base = require("./handlebars/base");
+
+// Each of these augment the Handlebars object. No need to setup here.
+// (This is done to easily share code between commonjs and browse envs)
+var SafeString = require("./handlebars/safe-string")["default"];
+var Exception = require("./handlebars/exception")["default"];
+var Utils = require("./handlebars/utils");
+var runtime = require("./handlebars/runtime");
+
+// For compatibility and usage outside of module systems, make the Handlebars object a namespace
+var create = function() {
+  var hb = new base.HandlebarsEnvironment();
+
+  Utils.extend(hb, base);
+  hb.SafeString = SafeString;
+  hb.Exception = Exception;
+  hb.Utils = Utils;
+
+  hb.VM = runtime;
+  hb.template = function(spec) {
+    return runtime.template(spec, hb);
+  };
+
+  return hb;
+};
+
+var Handlebars = create();
+Handlebars.create = create;
+
+exports["default"] = Handlebars;
+},{"./handlebars/base":45,"./handlebars/exception":46,"./handlebars/runtime":47,"./handlebars/safe-string":48,"./handlebars/utils":49}],45:[function(require,module,exports){
+"use strict";
+var Utils = require("./utils");
+var Exception = require("./exception")["default"];
+
+var VERSION = "1.3.0";
+exports.VERSION = VERSION;var COMPILER_REVISION = 4;
+exports.COMPILER_REVISION = COMPILER_REVISION;
+var REVISION_CHANGES = {
+  1: '<= 1.0.rc.2', // 1.0.rc.2 is actually rev2 but doesn't report it
+  2: '== 1.0.0-rc.3',
+  3: '== 1.0.0-rc.4',
+  4: '>= 1.0.0'
+};
+exports.REVISION_CHANGES = REVISION_CHANGES;
+var isArray = Utils.isArray,
+    isFunction = Utils.isFunction,
+    toString = Utils.toString,
+    objectType = '[object Object]';
+
+function HandlebarsEnvironment(helpers, partials) {
+  this.helpers = helpers || {};
+  this.partials = partials || {};
+
+  registerDefaultHelpers(this);
+}
+
+exports.HandlebarsEnvironment = HandlebarsEnvironment;HandlebarsEnvironment.prototype = {
+  constructor: HandlebarsEnvironment,
+
+  logger: logger,
+  log: log,
+
+  registerHelper: function(name, fn, inverse) {
+    if (toString.call(name) === objectType) {
+      if (inverse || fn) { throw new Exception('Arg not supported with multiple helpers'); }
+      Utils.extend(this.helpers, name);
+    } else {
+      if (inverse) { fn.not = inverse; }
+      this.helpers[name] = fn;
+    }
+  },
+
+  registerPartial: function(name, str) {
+    if (toString.call(name) === objectType) {
+      Utils.extend(this.partials,  name);
+    } else {
+      this.partials[name] = str;
+    }
+  }
+};
+
+function registerDefaultHelpers(instance) {
+  instance.registerHelper('helperMissing', function(arg) {
+    if(arguments.length === 2) {
+      return undefined;
+    } else {
+      throw new Exception("Missing helper: '" + arg + "'");
+    }
+  });
+
+  instance.registerHelper('blockHelperMissing', function(context, options) {
+    var inverse = options.inverse || function() {}, fn = options.fn;
+
+    if (isFunction(context)) { context = context.call(this); }
+
+    if(context === true) {
+      return fn(this);
+    } else if(context === false || context == null) {
+      return inverse(this);
+    } else if (isArray(context)) {
+      if(context.length > 0) {
+        return instance.helpers.each(context, options);
+      } else {
+        return inverse(this);
+      }
+    } else {
+      return fn(context);
+    }
+  });
+
+  instance.registerHelper('each', function(context, options) {
+    var fn = options.fn, inverse = options.inverse;
+    var i = 0, ret = "", data;
+
+    if (isFunction(context)) { context = context.call(this); }
+
+    if (options.data) {
+      data = createFrame(options.data);
+    }
+
+    if(context && typeof context === 'object') {
+      if (isArray(context)) {
+        for(var j = context.length; i<j; i++) {
+          if (data) {
+            data.index = i;
+            data.first = (i === 0);
+            data.last  = (i === (context.length-1));
+          }
+          ret = ret + fn(context[i], { data: data });
+        }
+      } else {
+        for(var key in context) {
+          if(context.hasOwnProperty(key)) {
+            if(data) { 
+              data.key = key; 
+              data.index = i;
+              data.first = (i === 0);
+            }
+            ret = ret + fn(context[key], {data: data});
+            i++;
+          }
+        }
+      }
+    }
+
+    if(i === 0){
+      ret = inverse(this);
+    }
+
+    return ret;
+  });
+
+  instance.registerHelper('if', function(conditional, options) {
+    if (isFunction(conditional)) { conditional = conditional.call(this); }
+
+    // Default behavior is to render the positive path if the value is truthy and not empty.
+    // The `includeZero` option may be set to treat the condtional as purely not empty based on the
+    // behavior of isEmpty. Effectively this determines if 0 is handled by the positive path or negative.
+    if ((!options.hash.includeZero && !conditional) || Utils.isEmpty(conditional)) {
+      return options.inverse(this);
+    } else {
+      return options.fn(this);
+    }
+  });
+
+  instance.registerHelper('unless', function(conditional, options) {
+    return instance.helpers['if'].call(this, conditional, {fn: options.inverse, inverse: options.fn, hash: options.hash});
+  });
+
+  instance.registerHelper('with', function(context, options) {
+    if (isFunction(context)) { context = context.call(this); }
+
+    if (!Utils.isEmpty(context)) return options.fn(context);
+  });
+
+  instance.registerHelper('log', function(context, options) {
+    var level = options.data && options.data.level != null ? parseInt(options.data.level, 10) : 1;
+    instance.log(level, context);
+  });
+}
+
+var logger = {
+  methodMap: { 0: 'debug', 1: 'info', 2: 'warn', 3: 'error' },
+
+  // State enum
+  DEBUG: 0,
+  INFO: 1,
+  WARN: 2,
+  ERROR: 3,
+  level: 3,
+
+  // can be overridden in the host environment
+  log: function(level, obj) {
+    if (logger.level <= level) {
+      var method = logger.methodMap[level];
+      if (typeof console !== 'undefined' && console[method]) {
+        console[method].call(console, obj);
+      }
+    }
+  }
+};
+exports.logger = logger;
+function log(level, obj) { logger.log(level, obj); }
+
+exports.log = log;var createFrame = function(object) {
+  var obj = {};
+  Utils.extend(obj, object);
+  return obj;
+};
+exports.createFrame = createFrame;
+},{"./exception":46,"./utils":49}],46:[function(require,module,exports){
+"use strict";
+
+var errorProps = ['description', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
+
+function Exception(message, node) {
+  var line;
+  if (node && node.firstLine) {
+    line = node.firstLine;
+
+    message += ' - ' + line + ':' + node.firstColumn;
+  }
+
+  var tmp = Error.prototype.constructor.call(this, message);
+
+  // Unfortunately errors are not enumerable in Chrome (at least), so `for prop in tmp` doesn't work.
+  for (var idx = 0; idx < errorProps.length; idx++) {
+    this[errorProps[idx]] = tmp[errorProps[idx]];
+  }
+
+  if (line) {
+    this.lineNumber = line;
+    this.column = node.firstColumn;
+  }
+}
+
+Exception.prototype = new Error();
+
+exports["default"] = Exception;
+},{}],47:[function(require,module,exports){
+"use strict";
+var Utils = require("./utils");
+var Exception = require("./exception")["default"];
+var COMPILER_REVISION = require("./base").COMPILER_REVISION;
+var REVISION_CHANGES = require("./base").REVISION_CHANGES;
+
+function checkRevision(compilerInfo) {
+  var compilerRevision = compilerInfo && compilerInfo[0] || 1,
+      currentRevision = COMPILER_REVISION;
+
+  if (compilerRevision !== currentRevision) {
+    if (compilerRevision < currentRevision) {
+      var runtimeVersions = REVISION_CHANGES[currentRevision],
+          compilerVersions = REVISION_CHANGES[compilerRevision];
+      throw new Exception("Template was precompiled with an older version of Handlebars than the current runtime. "+
+            "Please update your precompiler to a newer version ("+runtimeVersions+") or downgrade your runtime to an older version ("+compilerVersions+").");
+    } else {
+      // Use the embedded version info since the runtime doesn't know about this revision yet
+      throw new Exception("Template was precompiled with a newer version of Handlebars than the current runtime. "+
+            "Please update your runtime to a newer version ("+compilerInfo[1]+").");
+    }
+  }
+}
+
+exports.checkRevision = checkRevision;// TODO: Remove this line and break up compilePartial
+
+function template(templateSpec, env) {
+  if (!env) {
+    throw new Exception("No environment passed to template");
+  }
+
+  // Note: Using env.VM references rather than local var references throughout this section to allow
+  // for external users to override these as psuedo-supported APIs.
+  var invokePartialWrapper = function(partial, name, context, helpers, partials, data) {
+    var result = env.VM.invokePartial.apply(this, arguments);
+    if (result != null) { return result; }
+
+    if (env.compile) {
+      var options = { helpers: helpers, partials: partials, data: data };
+      partials[name] = env.compile(partial, { data: data !== undefined }, env);
+      return partials[name](context, options);
+    } else {
+      throw new Exception("The partial " + name + " could not be compiled when running in runtime-only mode");
+    }
+  };
+
+  // Just add water
+  var container = {
+    escapeExpression: Utils.escapeExpression,
+    invokePartial: invokePartialWrapper,
+    programs: [],
+    program: function(i, fn, data) {
+      var programWrapper = this.programs[i];
+      if(data) {
+        programWrapper = program(i, fn, data);
+      } else if (!programWrapper) {
+        programWrapper = this.programs[i] = program(i, fn);
+      }
+      return programWrapper;
+    },
+    merge: function(param, common) {
+      var ret = param || common;
+
+      if (param && common && (param !== common)) {
+        ret = {};
+        Utils.extend(ret, common);
+        Utils.extend(ret, param);
+      }
+      return ret;
+    },
+    programWithDepth: env.VM.programWithDepth,
+    noop: env.VM.noop,
+    compilerInfo: null
+  };
+
+  return function(context, options) {
+    options = options || {};
+    var namespace = options.partial ? options : env,
+        helpers,
+        partials;
+
+    if (!options.partial) {
+      helpers = options.helpers;
+      partials = options.partials;
+    }
+    var result = templateSpec.call(
+          container,
+          namespace, context,
+          helpers,
+          partials,
+          options.data);
+
+    if (!options.partial) {
+      env.VM.checkRevision(container.compilerInfo);
+    }
+
+    return result;
+  };
+}
+
+exports.template = template;function programWithDepth(i, fn, data /*, $depth */) {
+  var args = Array.prototype.slice.call(arguments, 3);
+
+  var prog = function(context, options) {
+    options = options || {};
+
+    return fn.apply(this, [context, options.data || data].concat(args));
+  };
+  prog.program = i;
+  prog.depth = args.length;
+  return prog;
+}
+
+exports.programWithDepth = programWithDepth;function program(i, fn, data) {
+  var prog = function(context, options) {
+    options = options || {};
+
+    return fn(context, options.data || data);
+  };
+  prog.program = i;
+  prog.depth = 0;
+  return prog;
+}
+
+exports.program = program;function invokePartial(partial, name, context, helpers, partials, data) {
+  var options = { partial: true, helpers: helpers, partials: partials, data: data };
+
+  if(partial === undefined) {
+    throw new Exception("The partial " + name + " could not be found");
+  } else if(partial instanceof Function) {
+    return partial(context, options);
+  }
+}
+
+exports.invokePartial = invokePartial;function noop() { return ""; }
+
+exports.noop = noop;
+},{"./base":45,"./exception":46,"./utils":49}],48:[function(require,module,exports){
+"use strict";
+// Build out our basic SafeString type
+function SafeString(string) {
+  this.string = string;
+}
+
+SafeString.prototype.toString = function() {
+  return "" + this.string;
+};
+
+exports["default"] = SafeString;
+},{}],49:[function(require,module,exports){
+"use strict";
+/*jshint -W004 */
+var SafeString = require("./safe-string")["default"];
+
+var escape = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#x27;",
+  "`": "&#x60;"
+};
+
+var badChars = /[&<>"'`]/g;
+var possible = /[&<>"'`]/;
+
+function escapeChar(chr) {
+  return escape[chr] || "&amp;";
+}
+
+function extend(obj, value) {
+  for(var key in value) {
+    if(Object.prototype.hasOwnProperty.call(value, key)) {
+      obj[key] = value[key];
+    }
+  }
+}
+
+exports.extend = extend;var toString = Object.prototype.toString;
+exports.toString = toString;
+// Sourced from lodash
+// https://github.com/bestiejs/lodash/blob/master/LICENSE.txt
+var isFunction = function(value) {
+  return typeof value === 'function';
+};
+// fallback for older versions of Chrome and Safari
+if (isFunction(/x/)) {
+  isFunction = function(value) {
+    return typeof value === 'function' && toString.call(value) === '[object Function]';
+  };
+}
+var isFunction;
+exports.isFunction = isFunction;
+var isArray = Array.isArray || function(value) {
+  return (value && typeof value === 'object') ? toString.call(value) === '[object Array]' : false;
+};
+exports.isArray = isArray;
+
+function escapeExpression(string) {
+  // don't escape SafeStrings, since they're already safe
+  if (string instanceof SafeString) {
+    return string.toString();
+  } else if (!string && string !== 0) {
+    return "";
+  }
+
+  // Force a string conversion as this will be done by the append regardless and
+  // the regex test will do this transparently behind the scenes, causing issues if
+  // an object's to string has escaped characters in it.
+  string = "" + string;
+
+  if(!possible.test(string)) { return string; }
+  return string.replace(badChars, escapeChar);
+}
+
+exports.escapeExpression = escapeExpression;function isEmpty(value) {
+  if (!value && value !== 0) {
+    return true;
+  } else if (isArray(value) && value.length === 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+exports.isEmpty = isEmpty;
+},{"./safe-string":48}],50:[function(require,module,exports){
+// Create a simple path alias to allow browserify to resolve
+// the runtime on a supported path.
+module.exports = require('./dist/cjs/handlebars.runtime');
+
+},{"./dist/cjs/handlebars.runtime":44}],51:[function(require,module,exports){
+module.exports = require("handlebars/runtime")["default"];
+
+},{"handlebars/runtime":50}],52:[function(require,module,exports){
 var calcRoute = require('../../../app/calcRoute');
 var MapObject = require('../../../app/MapObject');
 var expect = require('chai').expect
 
+var element = document.getElementById("map");
+
 describe("CalcRoute", function() {
   var result;
   var callback;
-  before(function(){
+
+  before(function(done){
+    mapObject = new MapObject(element);
     callback = function (res) {
+      console.dir(res);
       result = res;
+      done();
     };
-    calcRoute("seattle", "tacoma", callback, MapObject);
+    calcRoute("seattle", "tacoma", callback, mapObject.map);
   });
 
   it('return is an object', function() {
-   expect(result).to.be.equal({});
- });
+    // console.dir(result);
+    expect(result).to.be.an("object");
+  });
 
   it('return destination equals tacoma', function () {
-  expect(result.Tb.destination).to.be.equal("tacoma");
+    expect(result.Tb.destination).to.be.equal("tacoma");
   });
 });
 
-//mock a start and an end, make a mock request and test the results should equal etc.
 
-},{"../../../app/MapObject":1,"../../../app/calcRoute":5,"chai":9}]},{},[41])
+},{"../../../app/MapObject":1,"../../../app/calcRoute":5,"chai":12}],53:[function(require,module,exports){
+var calcRoute = require('../../../app/calcRoute');
+var MapObject = require('../../../app/MapObject');
+var paintRoute = require('../../../app/paintRoute');
+var expect = require('chai').expect
+
+var element = document.getElementById("map");
+
+describe("paintRoute", function() {
+  var result;
+  var callback;
+  var routeRenderer;
+
+  before(function(done){
+    mapObject = new MapObject(element);
+    callback = function (res) {
+      result = res;
+      done();
+    };
+    result = calcRoute("seattle", "tacoma", callback, mapObject.map);
+    paintRoute(result, mapObject.routeRenderer);
+  });
+
+  it('return is an object', function() {
+    expect(result).to.be.an("object");
+  });
+
+  it('return destination equals tacoma', function () {
+    expect(result.Tb.destination).to.be.equal("tacoma");
+  });
+});
+
+
+},{"../../../app/MapObject":1,"../../../app/calcRoute":5,"../../../app/paintRoute":6,"chai":12}]},{},[52,53])
