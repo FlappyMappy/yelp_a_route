@@ -1,7 +1,18 @@
-<b>{{name}}</b> <br>
-{{formatted_address}} <br>
-<br>
-  <a href="{{website}}" target="_newtab">website</a> <br>
-  {{formatted_phone_number}} <br>
-<br>
-  Rating: {{rating}}     <a href="{{url}}" target="_newtab">more info</a>
+<span class="infowindow-info">
+  <div class="infotitle">{{name}}</div>
+  {{formatted_address}}
+  <div class="infowindow-spaced">
+    {{#if website}}
+      <a href="{{website}}" target="_newtab">website</a> <br>
+    {{/if}}
+    {{formatted_phone_number}}
+  </div>
+  <div class="infowindow-spaced">
+    {{#if rating}}
+      Rating: {{rating}}/5
+    {{/if}}
+    {{#if url}}
+      <a href="{{url}}" target="_newtab">more info</a>
+    {{/if}}
+  </div>
+</span>
