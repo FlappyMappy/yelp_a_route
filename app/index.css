@@ -119,7 +119,7 @@ div.popup-search
   display: none;
   }
 
-  @media handheld
+  @media (max-device-width: 900px)
   {
     #toggle-bar
     {
