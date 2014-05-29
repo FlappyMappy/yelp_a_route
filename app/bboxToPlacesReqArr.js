@@ -1,4 +1,5 @@
 "use strict";
+/*global google:false */
 //Function takes an array of bounding boxes and options and
 //returns an array of request functions that accept a callback
 //and pass it results and pagination of google places
@@ -17,9 +18,17 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 	var reqArr = [];
 
 	var i;
+
 	for (i=0; i<bboxArray.length; i++) {
 
-		var req = (function() {
+		var req = getReqFunction(bboxArray[i]);
+
+		reqArr.push(req);
+	}
+
+
+	function getReqFunction (bbox) {
+		return (function() {
 			var reqOptions = {
 				types: options.types,
 				keyword: options.keyword,
@@ -28,7 +37,7 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 				maxPriceLevel: options.maxPriceLevel
 			};
 
-			reqOptions.bounds = bboxArray[i];
+			reqOptions.bounds = bbox;
 
 			return function(callback) {
 
@@ -45,8 +54,6 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 				});
 			};
 		})();
-
-		reqArr.push(req);
 	}
 
 	return reqArr;
