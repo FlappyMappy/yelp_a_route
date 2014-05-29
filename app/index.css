@@ -279,8 +279,10 @@ div.bottom
   color: white;//black;
   font-size: 11pt;
   font-weight: bold;
-  width: 100px;
+  //width: 100px;
   height: 30px;
+  padding-left: 10px;
+  padding-right: 10px;
   border-style: none;
   border-radius: 10px;
   box-shadow: 5px 5px 5px rgba(0, 0, 0, .5);
@@ -289,7 +291,7 @@ div.bottom
   left: 20px;
   }
 
-span.place_name
+div.place_name
   {
   font-weight: bold;
   }
