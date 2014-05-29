@@ -5,13 +5,9 @@ var $ = require ("jquery");
 
 module.exports = function Place (placeJSON, mapObject) {
   var that = this;
-  this.placeJSON = placeJSON;
 
   this.marker = new google.maps.Marker({
-
-    // for now, just get the name and location
-    position: this.placeJSON.geometry.location,
-    title: this.placeJSON.name,
+    position: placeJSON.geometry.location,
     map: mapObject.map,
     icon: {
       path: google.maps.SymbolPath.CIRCLE,
@@ -22,34 +18,25 @@ module.exports = function Place (placeJSON, mapObject) {
     }
   });
 
-
   this.element = "<div class='place_name' id='" + placeJSON.reference + "'>"
-                  + placeJSON.name + "</div><hr>";
+                + placeJSON.name + "</div><hr>";
+
+  // add each place to the list display
+  $(".list-display").append (this.element);
 
   this.detailRequest = function detailRequest (callback) {
     placesDetailRequest(placeJSON.reference, mapObject.map, callback);
   };
 
-  // add each place to the list display
-  $(".list-display").append (this.element);
-
   // add click functionality to each list item
-  $("#" + placeJSON.reference).click (function () {
-    infoWindow();
+  function expandListPlace() {
     // remove any detail spans already open
     $(".places_details").remove();
-
-    var place = this;
+    var place = $("#" + placeJSON.reference);
     that.detailRequest (function (result) {
-
-      console.log (result);
-
-
       // insert a span tag in the side panel containing the detailed text
-      //var temp_string = result.adr_address;
-      //var short_address = temp_string.split (",");
       $(place).after ("<span class='places_details'>"
-                        + "<br>" + result.vicinity //short_address[0]
+                        + "<br>" + result.vicinity
                         + "<br>" + result.formatted_phone_number
                         + "<br>" + result.rating + " / 5 Stars (" + result.user_ratings_total + " user reviews)"
                         + "<br><a href='" + result.website + "' target='_newtab'>" + result.website + "</a>"
@@ -57,11 +44,9 @@ module.exports = function Place (placeJSON, mapObject) {
                         + "<br><br>" + result.reviews[1].text
                         + "</span>");
     });
-  });
+  };
 
-
-  var infoWindow = function() {
-    console.log("opening infoWindow");
+  function infoWindow() {
     if (mapObject.openInfoWindow!==null){
       mapObject.openInfoWindow.close();
     };
@@ -75,6 +60,13 @@ module.exports = function Place (placeJSON, mapObject) {
     });
   };
 
-  google.maps.event.addListener(this.marker, 'click', infoWindow);
+  function infoWindowAndExpandList() {
+    expandListPlace();
+    infoWindow();
+  };
+
+  $("#" + placeJSON.reference).click(infoWindowAndExpandList);
+
+  google.maps.event.addListener(this.marker, 'click', infoWindowAndExpandList);
 
 };
