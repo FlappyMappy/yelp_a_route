@@ -112,30 +112,36 @@ div.popup-search
   box-shadow: 6px 6px 5px rgba(0, 0, 0, .75);
   text-align: center;
   display: none;
+  color: white;
+  font-weight: bold;
+  padding: 5px;
+  padding-top: 10px;
   }
 
   @media (max-width: 900px),(max-device-width: 900px)
   {
     #toggle-bar
     {
-
       display: inherit;
     }
 
     #list-box
     {
-      right: 30px;
+      right: 45px;//30px;
       left: 0;
       width: auto;
     }
 
-
     div.map-container
     {
-      right: 30px;
+      right: 45px;//30px;
     }
 
-
+    #list-box
+    {
+      //display: none;
+      visibility: hidden;
+    }
   }
 
 
