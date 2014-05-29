@@ -54,6 +54,11 @@ div.hide
   display: none;
 }
 
+div.show
+{
+  display: inherit;
+}
+
 div.zoom-map
 {
   margin: 0px;
@@ -90,8 +95,6 @@ div.popup-search
   {
   background-color: rgba(255, 255, 255, .3);
   padding: 20px;
-  //margin: 20px;
-  float: left;
   z-index: 20;
   width: 370px;
   border-radius: 10px;
@@ -101,6 +104,45 @@ div.popup-search
   bottom: 40px;
   box-shadow: 6px 6px 5px rgba(0, 0, 0, .75);
   }
+
+  #toggle-bar
+  {
+  background-color: rgba(255, 255, 255, .3);
+  width: 20px;
+  border-radius: 10px;
+  position: absolute;
+  right: 0;
+  top: 75px;
+  bottom: 40px;
+  box-shadow: 6px 6px 5px rgba(0, 0, 0, .75);
+  text-align: center;
+  display: none;
+  }
+
+  @media (max-width: 900px), handheld and (orientation: portrait)
+  {
+    #toggle-bar
+    {
+
+      display: inherit;
+    }
+
+    #list-box
+    {
+      right: 30px;
+      left: 0;
+      width: auto;
+    }
+
+
+    div.map-container
+    {
+      right: 30px;
+    }
+
+
+  }
+
 
 .options-panel
 {
@@ -197,13 +239,26 @@ div#right-options-box
 div.list-display
 {
   background-color: white;
-  width: 350px;
+  left: 20px;
+  right: 20px;
   padding: 10px;
   overflow: scroll;
   position: absolute;
-  top: 54px;//20px;
+  top: 54px;
   bottom: 20px;
 }
+
+div.places_label
+  {
+  background-color: rgb(96, 255, 128);
+  color: black;
+  font-weight: bold;
+  font-size: 16pt;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  padding: 5px;
+  padding-left: 15px;
+  }
 
 div.bottom
 {
@@ -248,17 +303,7 @@ span.friendly_text
   font-weight: bold;
   }
 
-div.places_label
-  {
-  background-color: rgb(96, 255, 128);
-  color: black;
-  font-weight: bold;
-  font-size: 16pt;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  padding: 5px;
-  padding-left: 15px;
-  }
+
 
 span.places_details
   {
