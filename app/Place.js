@@ -22,6 +22,7 @@ module.exports = function Place (placeJSON, mapObject) {
     }
   });
 
+
   this.element = "<div class='place_name' id='" + placeJSON.reference + "'>"
                   + placeJSON.name + "</div><hr>";
 
@@ -42,6 +43,7 @@ module.exports = function Place (placeJSON, mapObject) {
     that.detailRequest (function (result) {
 
       console.log (result);
+
 
       // insert a span tag in the side panel containing the detailed text
       //var temp_string = result.adr_address;
