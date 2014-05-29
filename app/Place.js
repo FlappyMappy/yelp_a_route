@@ -46,14 +46,14 @@ module.exports = function Place (placeJSON, mapObject) {
       // insert a span tag in the side panel containing the detailed text
       //var temp_string = result.adr_address;
       //var short_address = temp_string.split (",");
-      $(place).after ("<span class='places_details'>"
-                        + "<br>" + result.vicinity //short_address[0]
+      $(place).after ("<div class='places_details'>"
+                                 + result.vicinity //short_address[0]
                         + "<br>" + result.formatted_phone_number
                         + "<br>" + result.rating + " / 5 Stars (" + result.user_ratings_total + " user reviews)"
                         + "<br><a href='" + result.website + "' target='_newtab'>" + result.website + "</a>"
                         + "<br><br>" + result.reviews[0].text
                         + "<br><br>" + result.reviews[1].text
-                        + "</span>");
+                        + "</div>");
     });
   });
 
