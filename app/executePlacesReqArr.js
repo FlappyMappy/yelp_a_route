@@ -17,8 +17,7 @@ module.exports = function executePlacesReqArr(reqArr, callback){
 			setTimeout(function(){
 				makeReq();
 			},500);
-		};
-	};
-
+		}
+	}
 	makeReq();
 };
