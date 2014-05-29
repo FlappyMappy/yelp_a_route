@@ -35,6 +35,9 @@ module.exports = function Place (placeJSON, mapObject) {
   // add click functionality to each list item
   $("#" + placeJSON.reference).click (function () {
 
+    // remove any detail blocks already open
+    $(".places_details").remove();
+
     var place = this;
     that.detailRequest (function (result) {
 
