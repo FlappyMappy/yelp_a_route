@@ -1,20 +1,23 @@
 var calcRoute = require('../../../app/calcRoute');
 var MapObject = require('../../../app/MapObject');
+var paintRoute = require('../../../app/paintRoute');
 var expect = require('chai').expect
 
 var element = document.getElementById("map");
 
-describe("CalcRoute", function() {
+describe("paintRoute", function() {
   var result;
   var callback;
+  var routeRenderer;
 
   before(function(done){
     mapObject = new MapObject(element);
     callback = function (res) {
       result = res;
-        done();
+      done();
     };
-    calcRoute("seattle", "tacoma", callback, mapObject.map);
+    result = calcRoute("seattle", "tacoma", callback, mapObject.map);
+    paintRoute(result, mapObject.routeRenderer);
   });
 
   it('return is an object', function() {

@@ -6,50 +6,34 @@ var MapObject = require('./MapObject');
 var calcRoute = require('./calcRoute');
 var paintRoute = require('./paintRoute');
 var Places = require('./Places');
-var parseFullPath = require('./parseFullPath');
-var polylineToBBox = require('./polylineToBBox');
-var bboxToPlacesReqArr = require('./bboxToPlacesReqArr');
-var polylineMileSplit = require('./polylineMileSplit');
-var executePlacesReqArr = require('./executePlacesReqArr');
 var placesDetailRequest = require('./placesDetailRequest');
+var panToReload = require('./panToReload');
+var populatePlaces = require('./populatePlaces');
+var parseFullPath = require('./parseFullPath');
 var kilometersPerMile = 1.6;
 
 google.maps.event.addDomListener(window,'load',function() {
 
-
-  var mapObject = new MapObject(document.getElementById("index-map-canvas"),
-    {
-       center: new google.maps.LatLng( 39.8,-98.6),
-       zoom: 4,
-       disableDefaultUI: true
-    }
-  );
-
-  mapObject.routeRenderer.setOptions({
-    suppressMarkers: true,
-    polylineOptions: {
-      strokeColor: 'black'
-    }
-  });
-
-
-  var zoomMapObject = new MapObject(document.getElementById("zoom-map-canvas"),
+  //create instance of our global object
+  var mapObject = new MapObject(document.getElementById("zoom-map-canvas"),
     {
        center: new google.maps.LatLng( 39.8,-98.6),
        zoom: 4
     }
   );
 
-  zoomMapObject.routeRenderer.setOptions({
+  mapObject.routeRenderer.setOptions({
     preserveViewport: true
   });
+
+  panToReload(mapObject);
 
   //adds/removes types from the search options object when boxes clicked
   $(".option-checkbox").on("change", function(){
     var option = $(this).val();
     if($(this).is(":checked")){
       mapObject.searchOptions.types.push(option);
-      console.log("added " + option + " type");
+
     } else {
       var index = mapObject.searchOptions.types.indexOf(option);
       mapObject.searchOptions.types.splice(index,index+1);
@@ -79,62 +63,28 @@ google.maps.event.addDomListener(window,'load',function() {
     mapObject.searchOptions.openNow = $("#open-checkbox").is(":checked") ? true : false;
     mapObject.searchOptions.minPriceLevel = $("#min-price").val();
     mapObject.searchOptions.maxPriceLevel = $("#max-price").val();
-    console.log("Search from: " + $("#start").val());
-    console.log("Search to: "   + $("#destination").val());
-    console.log("Distance to search from route " + mapObject.searchDistance + "kms");
-    console.log("opennow set to " + mapObject.searchOptions.openNow );
-    console.log("Min price set to " + mapObject.searchOptions.minPriceLevel);
-    console.log("Max price set to " + mapObject.searchOptions.maxPriceLevel);
+
 
     $('#route-box').addClass('hide');
 
-    zoomMapObject.places.clearPlaces();
+    mapObject.places.clearPlaces();
 
     calcRoute($("#start").val(), $("#destination").val(), function(res){
       //paint the route to the map
       paintRoute(res, mapObject.routeRenderer);
-      paintRoute(res, zoomMapObject.routeRenderer);
 
-      //gets first 10 miles of directions path
-      var placesPathSegment = polylineMileSplit(parseFullPath(res.routes[0]), 0, 10);
+      //add the active route to the mapObject in full resolution
+      //by parsing the individual leg polylines into one master polyine
+      mapObject.activeRoute = parseFullPath(res.routes[0]);
 
-      var bboxArray = polylineToBBox(placesPathSegment, mapObject.searchDistance);
+      //call function that takes a polyline, mapObject
+      //start point in miles and paints markers on map
+      populatePlaces(mapObject.activeRoute, mapObject, 0);
 
-      var placesReqArray = bboxToPlacesReqArr(bboxArray, mapObject.searchOptions, mapObject.map);
-
-      executePlacesReqArr(placesReqArray, function (result) {
-        _.each(result, function (placeJSON) {
-          zoomMapObject.places.addPlace(placeJSON, zoomMapObject);
-        });
-      });
-
-      //combine all of bboxArray into one bbox that will be start viewport
-      var oneBBOX = new google.maps.LatLngBounds(bboxArray[0].getSouthWest(),
-            bboxArray[0].getNorthEast());
-
-      var oneBBOX = bboxArray[0];
-      _.each(bboxArray, function (bbox) {
-        oneBBOX.extend(bbox.getNorthEast());
-        oneBBOX.extend(bbox.getSouthWest());
-      });
-
-      zoomMapObject.map.fitBounds(oneBBOX);
-      zoomMapObject.map.setCenter(placesPathSegment[0]);
-      zoomMapObject.map.setZoom(11);
-
-      indexMarker = new google.maps.Marker({
-
-          // for now, just get the name and location
-          position: placesPathSegment[0],
-          map: mapObject.map,
-          icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 10,
-            strokeWeight: 1,
-            fillOpacity: 1,
-            fillColor: "red"
-          }
-      });
+      //center map on start point
+      //and zoom to default zoom level
+      mapObject.map.setCenter(mapObject.activeRoute[0]);
+      mapObject.map.setZoom(11);
 
     }, mapObject.map);
 

@@ -67,24 +67,6 @@ div.zoom-map
   z-index: 10
 }
 
-div.index-map
-{
-  width: 200px;
-  height: 200px;
-  right: 0;
-  top: 10%;
-  bottom: 10%;
-  border-radius: 10px;
-  margin-right: 20px;
-  margin-left: 10px;
-  position: absolute;
-  z-index:12;
-  border-style: solid;
-  border-color: black;
-  border-width: 2px;
-  box-shadow: 6px 6px 5px rgba(0, 0, 0, .5);
-}
-
 .popup-search-box
 {
 }
