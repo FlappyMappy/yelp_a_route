@@ -18,8 +18,8 @@ module.exports = function Place (placeJSON, mapObject) {
     }
   });
 
-  this.element = "<div class='place_name' id='" + placeJSON.reference + "'>"
-                + placeJSON.name + "</div><hr>";
+  this.element = "<div class='place_name' id='" + placeJSON.reference + "'>" +
+                   placeJSON.name + "</div><hr>";
 
   // add each place to the list display
   $(".list-display").append (this.element);
@@ -35,21 +35,21 @@ module.exports = function Place (placeJSON, mapObject) {
     var place = $("#" + placeJSON.reference);
     that.detailRequest (function (result) {
       // insert a span tag in the side panel containing the detailed text
-      $(place).after ("<span class='places_details'>"
-                        + "<br>" + result.vicinity
-                        + "<br>" + result.formatted_phone_number
-                        + "<br>" + result.rating + " / 5 Stars (" + result.user_ratings_total + " user reviews)"
-                        + "<br><a href='" + result.website + "' target='_newtab'>" + result.website + "</a>"
-                        + "<br><br>" + result.reviews[0].text
-                        + "<br><br>" + result.reviews[1].text
-                        + "</div>");
+      $(place).after ("<span class='places_details'>" +
+                      "<br>" + result.vicinity +
+                      "<br>" + result.formatted_phone_number +
+                      "<br>" + result.rating + " / 5 Stars (" + result.user_ratings_total + " user reviews)" +
+                      "<br><a href='" + result.website + "' target='_newtab'>" + result.website + "</a>" +
+                      "<br><br>" + result.reviews[0].text +
+                      "<br><br>" + result.reviews[1].text +
+                      "</div>");
     });
-  };
+  }
 
   function infoWindow() {
     if (mapObject.openInfoWindow!==null){
       mapObject.openInfoWindow.close();
-    };
+    }
 
     that.detailRequest(function(result){
       that.infoWindow = new google.maps.InfoWindow({
@@ -58,12 +58,12 @@ module.exports = function Place (placeJSON, mapObject) {
       mapObject.openInfoWindow = that.infoWindow;
       mapObject.openInfoWindow.open(mapObject.map, that.marker);
     });
-  };
+  }
 
   function infoWindowAndExpandList() {
     expandListPlace();
     infoWindow();
-  };
+  }
 
   $("#" + placeJSON.reference).click(infoWindowAndExpandList);
 
