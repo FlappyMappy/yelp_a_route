@@ -35,7 +35,7 @@ module.exports = function Place (placeJSON, mapObject) {
 
   // add click functionality to each list item
   $("#" + placeJSON.reference).click (function () {
-
+    infoWindow();
     // remove any detail spans already open
     $(".places_details").remove();
 
@@ -59,11 +59,13 @@ module.exports = function Place (placeJSON, mapObject) {
     });
   });
 
-  google.maps.event.addListener(this.marker, 'click', function() {
 
+  var infoWindow = function() {
+    console.log("opening infoWindow");
     if (mapObject.openInfoWindow!==null){
       mapObject.openInfoWindow.close();
     };
+
     that.detailRequest(function(result){
       that.infoWindow = new google.maps.InfoWindow({
         content: template(result)
@@ -71,6 +73,8 @@ module.exports = function Place (placeJSON, mapObject) {
       mapObject.openInfoWindow = that.infoWindow;
       mapObject.openInfoWindow.open(mapObject.map, that.marker);
     });
+  };
 
-  });
+  google.maps.event.addListener(this.marker, 'click', infoWindow);
+
 };
