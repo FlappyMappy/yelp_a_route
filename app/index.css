@@ -103,7 +103,7 @@ div.popup-search
 #toggle-bar
   {
   background-color: rgba(255, 255, 255, .3);
-  width: 20px;
+  width: 35px;
   border-radius: 10px;
   position: absolute;
   right: 0;
@@ -113,9 +113,10 @@ div.popup-search
   text-align: center;
   display: none;
   color: white;
+  font-size: 16pt;
   font-weight: bold;
   padding: 5px;
-  padding-top: 10px;
+  padding-top: 15px;
   }
 
   @media (max-width: 900px),(max-device-width: 900px)
@@ -127,14 +128,14 @@ div.popup-search
 
     #list-box
     {
-      right: 45px;//30px;
+      right: 60px;
       left: 0;
       width: auto;
     }
 
     div.map-container
     {
-      right: 45px;//30px;
+      right: 60px;
     }
 
     #list-box
