@@ -243,30 +243,58 @@ span.places_details
   font-size: 10pt;
   }
 
+.infowindow-info
+  {
+  color: #2c2c2c;
+  width: 204px;
+  }
+
+.infotitle
+  {
+  font-weight: 400;
+  font-size: 13px;
+  }
+
+.infowindow-spaced
+  {
+  padding-top: 6px;
+  }
+
+a
+  {
+  color: #4272db;
+  text-decoration: none;
+  }
+
+a:hover
+  {
+   text-decoration: underline;
+  }
+
 .color-1
   {
-    background-color: rgb(96, 255, 128);
-    //Big new-route button, header, places header
+  background-color: rgb(96, 255, 128);
+  //Big new-route button, header, places header
   }
 
 .color-2
   {
-    background-color: rgb(0, 0, 255);
-    //Small new route button, pop-up window
+  background-color: rgb(0, 0, 255);
+  //Small new route button, pop-up window
   }
 
 .color-3
   {
-    background-color: #387EE0;
-    //Options box
+  background-color: #387EE0;
+  //Options box
   }
 
 .button-color-A
   {
-    background-color: rgb(96, 255, 128);
+  background-color: rgb(96, 255, 128);
   }
 
 .button-color-B
   {
-    background-color: rgb(255, 128, 128);
+  background-color: rgb(255, 128, 128);
   }
