@@ -9,62 +9,94 @@
 </head>
 
 <body>
-
-  <header class = "top-bar">Flappy Mappy
-          <button type="button" id="new-route-button">New Route</button>
+  <header class = "top-bar">
+    <button type="button" id="new-route-button">New Route</button>
+    Flappy Mappy
   </header>
 
   <div class = "map-container">
     <div class = "zoom-map" id = "zoom-map-canvas"></div>
-    <div class = "index-map" id = "index-map-canvas"></div>
+  </div>
+
+  <div id = "toggle-bar">
+  L<br>I<br>S<br>T<br><br>V<br>I<br>E<br>W
   </div>
 
   <div id="route-box" class = "map-container popup-search">
-    <div class = "popup-search-box">
-      <form type = "POST" class = "search">
-        <div class = "inputs">
-          <div id = "a" class= "letter">A</div>
-          <input type = "text" id="start" class = "search-box" placeholder = "Where From?" value = "seattle" required>
-          <br><br>
-          <div id = "b" class="letter">B</div>
-          <input type = "text" id="destination" class = "search-box" placeholder = "Where To?" value = "lynnwood" required>
-        </div>
-        <div id = "route-button-wrapper">
-          <button id = "route-button">New Route</button>
-        </div>
-      </form>
-      <section class="options-panel">
-        <article>
-          Search
-          <select id="distances">
-            <option value="1">1</option>
-            <option value="2" selected>2</option>
-            <option value="5">5</option>
-            <option value="10">10</option>
-          </select>
-          miles from route for:
+    <form class = "search">
+      <div class = "inputs">
+        <div id = "a" class= "letter">A</div>
+        <input type = "text" id="start" class = "search-box" placeholder = "Where From?" value = "seattle" required>
+        <br><br>
+        <div id = "b" class="letter">B</div>
+        <input type = "text" id="destination" class = "search-box" placeholder = "Where To?" value = "lynnwood" required>
+      </div>
+      <div id = "route-button-wrapper">
+        <button id = "route-button">New Route</button>
+      </div>
+    </form>
+    <section class="options-panel">
+      <article>
+        Search for<br>
+        <input type="text" id="keyword" class="search-box" value="" placeholder="Restaurants, Pet Shops, etc."><br>
+        within
+        <select id="distances">
+          <option value="0.5">0.5</option>
+          <option value="1">1</option>
+          <option value="2" selected>2</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+        </select>
+        miles from route<br>
+        <hr/>
+        <div id="left-options-box">
           <div id="types">
-            Food <input type="checkbox" id="food-checkbox" class="option-checkbox" value="food">
-            Gas <input type="checkbox"  id="gas-checkbox" class="option-checkbox" value="gas_station">
-            Shopping <input type="checkbox" id="shopping-checkbox" class="option-checkbox" value="store">
+            <input type="checkbox" id="food-checkbox" class="option-checkbox" value="food">Food<br>
+            <input type="checkbox"  id="gas-checkbox" class="option-checkbox" value="gas_station">Gas<br>
+            <input type="checkbox" id="shopping-checkbox" class="option-checkbox" value="store">Shopping
           </div>
-          <br />
-          <input type="text" id="keyword" class="search-box" value="" placeholder="Restaurants, Pet Shops, etc.">
-        </article>
-      </section>
-    </div>
+        </div>
+        <div id="right-options-box">
+          Open now <input type="checkbox" id="open-checkbox" value="openNow"><br>
+          Price: <br>
+          <select id="min-price">
+          <option value="0" selected></option>
+            <option value="1">$</option>
+            <option value="2">$$</option>
+            <option value="3">$$$</option>
+            <option value="4">$$$$</option>
+          </select>
+          to
+          <select id="max-price">
+            <option value="0"></option>
+            <option value="1">$</option>
+            <option value="2" selected>$$</option>
+            <option value="3">$$$</option>
+            <option value="4">$$$$</option>
+          </select>
+        </div>
+      </article>
+    </section>
   </div>
-  <div id="places-list" class =  "right-column">
 
+  <div id="list-box" class = "box">
+    <div class = "places_label">Places</div>
+    <div class = "list-display">
+      <span class="friendly_text">
+        Enter a trip on the left.<br>
+        <br>
+        I'll show you places along the way!
+      </span>
+    </div>
   </div>
 
   <div class="bottom">
     Team FlappyMappy, 2014
   </div>
 
-  <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization,places&key=AIzaSyA7tOZNjgHPNh5a-zL1Mo9EFIysbwUU4s4&sensor=false"></script>
-  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/routeboxer/src/RouteBoxer.js"></script>
-  <script src = "app.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization,places&key=AIzaSyA7tOZNjgHPNh5a-zL1Mo9EFIysbwUU4s4&sensor=false"></script>
+    <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/routeboxer/src/RouteBoxer.js"></script>
+    <script src = "app.js"></script>
 
-</body>
+  </body>
 </html>

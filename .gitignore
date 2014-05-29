@@ -26,5 +26,4 @@ node_modules
 
 app/bower_components
 https
-dist
 test/front-end/test-suite.js
