@@ -100,7 +100,7 @@ div.popup-search
   box-shadow: 6px 6px 5px rgba(0, 0, 0, .75);
   }
 
-  #toggle-bar
+#toggle-bar
   {
   background-color: rgba(255, 255, 255, .3);
   width: 20px;
@@ -112,30 +112,36 @@ div.popup-search
   box-shadow: 6px 6px 5px rgba(0, 0, 0, .75);
   text-align: center;
   display: none;
+  color: white;
+  font-weight: bold;
+  padding: 5px;
+  padding-top: 10px;
   }
 
   @media (max-width: 900px),(max-device-width: 900px)
   {
     #toggle-bar
     {
-
       display: inherit;
     }
 
     #list-box
     {
-      right: 30px;
+      right: 45px;//30px;
       left: 0;
       width: auto;
     }
 
-
     div.map-container
     {
-      right: 30px;
+      right: 45px;//30px;
     }
 
-
+    #list-box
+    {
+      display: none;
+      //visibility: hidden;
+    }
   }
 
 
@@ -291,11 +297,6 @@ div.places_details
   font-size: 10pt;
   border-radius: 10px;
   padding: 10px;
-  }
-
-span.places_details
-  {
-  font-size: 10pt;
   }
 
 .infowindow-info

@@ -35,8 +35,8 @@ module.exports = function Place (placeJSON, mapObject) {
     var place = $("#" + placeJSON.reference);
     that.detailRequest (function (result) {
       // insert a span tag in the side panel containing the detailed text
-      $(place).after ("<span class='places_details'>" +
-                      "<br>" + result.vicinity +
+      $(place).after ("<div class='places_details'>" +
+                               result.vicinity +
                       "<br>" + result.formatted_phone_number +
                       "<br>" + result.rating + " / 5 Stars (" + result.user_ratings_total + " user reviews)" +
                       "<br><a href='" + result.website + "' target='_newtab'>" + result.website + "</a>" +
