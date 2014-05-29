@@ -1,14 +1,17 @@
 var $ = require ("jquery");
 
-$("#toggle-bar").click (function () {
-  if ($("#list-box").css ("visibility") == "hidden")
+// if the user clicks the toggle bar
+$("#toggle-bar").click (function ()
+{
+  // change the text on the bar from "list view" to "map view" and vice versa
+  if ($("#list-box").css ("display") == "none")
   {
-    $("#list-box").css ("visibility", "visible");
     $(this).html ("M<br>A<br>P<br><br>V<br>I<br>E<br>W");
   }
   else
   {
-    $("#list-box").css ("visibility", "hidden");
     $(this).html ("L<br>I<br>S<br>T<br><br>V<br>I<br>E<br>W");
   }
+  // and show/hide the list view window
+  $("#list-box").fadeToggle();
 });

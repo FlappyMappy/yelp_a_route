@@ -100,7 +100,7 @@ div.popup-search
   box-shadow: 6px 6px 5px rgba(0, 0, 0, .75);
   }
 
-  #toggle-bar
+#toggle-bar
   {
   background-color: rgba(255, 255, 255, .3);
   width: 20px;
@@ -139,8 +139,8 @@ div.popup-search
 
     #list-box
     {
-      //display: none;
-      visibility: hidden;
+      display: none;
+      //visibility: hidden;
     }
   }
 
