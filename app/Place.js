@@ -42,7 +42,7 @@ module.exports = function Place (placeJSON, mapObject) {
                         + "<br><a href='" + result.website + "' target='_newtab'>" + result.website + "</a>"
                         + "<br><br>" + result.reviews[0].text
                         + "<br><br>" + result.reviews[1].text
-                        + "</span>");
+                        + "</div>");
     });
   };
 
