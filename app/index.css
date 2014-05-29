@@ -71,16 +71,6 @@ div.zoom-map
 {
 }
 
-div.right-column
-{
-  position: absolute;
-  width: 415px;
-  right: 0;
-  bottom: 40px;
-  top: 75px;
-  background-color: rgba(96, 255, 128, .3);
-}
-
 div.popup-search
 {
   margin: auto;
@@ -93,7 +83,7 @@ div.popup-search
   //border-style: solid;
   //border-color: rgb(0, 0, 0);//96, 255, 128);
   //border-width: 2px;//4px;
-  z-index: 20;
+  z-index: 30;
   }
 
 #list-box
@@ -266,4 +256,9 @@ div.places_label
   border-top-right-radius: 10px;
   padding: 5px;
   padding-left: 15px;
+  }
+
+span.places_details
+  {
+  font-size: 10pt;
   }
