@@ -119,7 +119,7 @@ div.popup-search
   display: none;
   }
 
-  @media (max-width: 900px), handheld and (orientation: portrait)
+  @media handheld
   {
     #toggle-bar
     {
