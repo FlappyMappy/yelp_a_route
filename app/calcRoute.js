@@ -17,5 +17,3 @@ module.exports = function calcRoute(start, end, callback, map) {
         }
     });
 };
-
-

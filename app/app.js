@@ -1,4 +1,3 @@
-
 var $ = require('jquery');
 var _ = require('underscore');
 
@@ -96,6 +95,5 @@ google.maps.event.addDomListener(window,'load',function() {
       mapObject.map.setZoom(11);
 
     }, mapObject.map);
-
   });
 });

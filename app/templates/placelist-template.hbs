@@ -1,16 +1,34 @@
 <div class='places_details'>
-  <img style="float: right; height=10px; width=10px;" src="{{icon}}">
-  {{vicinity}}<br>
-  {{formatted_phone_number}}<br>
+  <img class="list-icon" src="{{icon}}">
+
+  {{vicinity}}
+  <br>
+
+  {{formatted_phone_number}}
+  <br>
+
   {{#if rating}}
     Rating: {{rating}} / 5 Stars ({{user_ratings_total}} user reviews)<br>
   {{/if}}
+
   {{#if website}}
     <a href='{{website}}' target='_newtab'>{{short_website}}</a>
+    <br>
   {{/if}}
-  <br><br>
-  {{{reviews.0.text}}} <br><hr>
-  {{{reviews.1.text}}} <br><br>
+
+  {{#if reviews.0.text}}
+    <br>
+    {{{reviews.0.text}}}
+    <br>
+  {{/if}}
+
+  {{#if reviews.1.text}}
+    <hr>
+    {{{reviews.1.text}}}
+    <br>
+  {{/if}}
+  <br>
+
   {{#if url}}
       <a href="{{url}}" target="_newtab">  more info</a>
   {{/if}}
