@@ -1,6 +1,6 @@
-var placesDetailRequest = require('./placesDetailRequest');
-var _ = require('underscore');
-var template = require('./template.hbs');
+"use strict";
+var placesDetailRequest = require("./placesDetailRequest");
+var template = require("./template.hbs");
 var $ = require ("jquery");
 var jQuery = $;
 var ScrollTo = require("./vendor/jquery.scrollTo.min");
@@ -38,14 +38,14 @@ module.exports = function Place (placeJSON, mapObject) {
 
     that.detailRequest (function (result) {
       // insert a span tag in the side panel containing the detailed text
-      place.after ("<div class='places_details'>"
-                        + "<br>" + result.vicinity
-                        + "<br>" + result.formatted_phone_number
-                        + "<br>" + result.rating + " / 5 Stars (" + result.user_ratings_total + " user reviews)"
-                        + "<br><a href='" + result.website + "' target='_newtab'>" + result.website + "</a>"
-                        + "<br><br>" + result.reviews[0].text
-                        + "<br><br>" + result.reviews[1].text
-                        + "</div>");
+      place.after ("<div class='places_details'>" + "<br>" +
+        result.vicinity + "<br>" +
+        result.formatted_phone_number+ "<br>" +
+        result.rating + " / 5 Stars (" + result.user_ratings_total + " user reviews)"+
+        "<br><a href='" + result.website + "' target='_newtab'>" + result.website + "</a>"+ "<br><br>" +
+        result.reviews[0].text+ "<br><br>" +
+        result.reviews[1].text+ "</div>");
+
     $(".list-display").scrollTo(place, 2000);
     });
   }
@@ -71,6 +71,5 @@ module.exports = function Place (placeJSON, mapObject) {
 
   $("#" + placeJSON.reference).click(infoWindowAndExpandList);
 
-  google.maps.event.addListener(this.marker, 'click', infoWindowAndExpandList);
-
+  google.maps.event.addListener(this.marker, "click", infoWindowAndExpandList);
 };
