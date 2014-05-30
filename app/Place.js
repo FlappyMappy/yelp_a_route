@@ -25,24 +25,28 @@ module.exports = function Place (placeJSON, mapObject) {
   // add each place to the list display
   $(".list-display").append (this.element);
 
+  // defines the detail place request
   this.detailRequest = function detailRequest (callback) {
     placesDetailRequest(placeJSON.reference, mapObject.map, callback);
   };
 
-  // closes windows/placelist divs, makes detail request, calls other funcs
-  function makeRequest(result) {
-    $(".places_details").remove();
-    if (mapObject.openInfoWindow!==null){
-      mapObject.openInfoWindow.close();
-    }
-    that.detailRequest (function (result) {
-      var website = result.website;
-      if (website){
-        result.short_website = shortenWebsite(website);
+  // if the request placelist/infowindow is not already open
+  // close windows/placelist divs, make detail request, call other funcs
+  function makeRequest() {
+    if(mapObject.openInfoWindow !== that.infoWindow){
+      $(".places_details").remove();
+      if (mapObject.openInfoWindow!==null){
+        mapObject.openInfoWindow.close();
       }
-      infoWindow(result);
-      expandListPlace(result);
-    });
+      that.detailRequest (function (result) {
+        var website = result.website;
+        if (website){
+          result.short_website = shortenWebsite(website);
+        }
+        infoWindow(result);
+        expandListPlace(result);
+      });
+    }
   }
 
   // passes result into info template, opens info window
