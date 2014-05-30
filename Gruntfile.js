@@ -95,6 +95,6 @@ module.exports = function (grunt) {
     grunt.registerTask('server', ['jshint', 'express:dev', 'build', 'watch']);
     grunt.registerTask('serve', ['server']);
     grunt.registerTask('test', ['jshint', 'browserify:test', 'express:dev', 'casper:acceptance']);
-    gitrunt.registerTask('build', ['clean', 'browserify:standalone', 'copy']);
+    grunt.registerTask('build', ['clean', 'browserify:standalone', 'copy']);
 
 };
