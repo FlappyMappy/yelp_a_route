@@ -298,6 +298,7 @@ div.places_details
   font-size: 10pt;
   border-radius: 10px;
   padding: 10px;
+  text-align: justify;
   }
 
 .infowindow-info
