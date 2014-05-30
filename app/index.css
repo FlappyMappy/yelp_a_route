@@ -120,7 +120,7 @@ div.popup-search
   padding-top: 15px;
   }
 
-  @media (max-width: 900px),(max-device-width: 900px)
+@media (max-width: 900px),(max-device-width: 900px)
   {
     #toggle-bar
     {
@@ -142,7 +142,14 @@ div.popup-search
     #list-box
     {
       display: none;
-      //visibility: hidden;
+    }
+  }
+
+@media (min-width: 901px), (min-device-width: 901px)
+  {
+  #list-box
+    {
+    display: inline;
     }
   }
 
