@@ -21,8 +21,8 @@ module.exports = function Place (placeJSON, mapObject) {
     }
   });
 
-  this.element = "<div class='place_name' id='" + placeJSON.reference + "'>"
-                + placeJSON.name + "</div><hr>";
+  this.element = "<div class='place_name' id='" + placeJSON.reference + "'>" +
+                   placeJSON.name + "</div><hr>";
 
   // add each place to the list display
   $(".list-display").append (this.element);
@@ -46,15 +46,14 @@ module.exports = function Place (placeJSON, mapObject) {
                         + "<br><br>" + result.reviews[0].text
                         + "<br><br>" + result.reviews[1].text
                         + "</div>");
-    console.dir($(".list-display"));
     $(".list-display").scrollTo(place, 2000);
     });
-  };
+  }
 
   function infoWindow() {
     if (mapObject.openInfoWindow!==null){
       mapObject.openInfoWindow.close();
-    };
+    }
 
     that.detailRequest(function(result){
       that.infoWindow = new google.maps.InfoWindow({
@@ -63,12 +62,12 @@ module.exports = function Place (placeJSON, mapObject) {
       mapObject.openInfoWindow = that.infoWindow;
       mapObject.openInfoWindow.open(mapObject.map, that.marker);
     });
-  };
+  }
 
   function infoWindowAndExpandList() {
     expandListPlace();
     infoWindow();
-  };
+  }
 
   $("#" + placeJSON.reference).click(infoWindowAndExpandList);
 

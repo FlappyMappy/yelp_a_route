@@ -51,7 +51,8 @@ module.exports = function (grunt) {
 
             js: {
                 files: '<%= browserify.standalone.src %>',
-                tasks: ['browserify:standalone']
+                tasks: ['jshint', 'browserify:standalone', 
+                        'browserify:test', 'casper:acceptance']
             },
 
             testjs: {
@@ -75,13 +76,25 @@ module.exports = function (grunt) {
                     script: 'server.js'
                 }
             },
+        },
+
+        casper : {
+         acceptance : {
+            options : {
+              test : true
+            },
+            files : {
+              'test/front-end/acceptance/casper-results.xml' : 
+                    ['test/front-end/acceptance/main_page_test.js']
+            }
+          }
         }
 
     });
-
-    grunt.registerTask('server', ['express:dev', 'build', 'watch']);
+    
+    grunt.registerTask('server', ['jshint', 'express:dev', 'build', 'watch']);
     grunt.registerTask('serve', ['server']);
-    grunt.registerTask('test', ['browserify:test', 'watch']);
+    grunt.registerTask('test', ['jshint', 'browserify:test', 'casper:acceptance']);
     grunt.registerTask('build', ['clean', 'browserify:standalone', 'copy']);
 
 };

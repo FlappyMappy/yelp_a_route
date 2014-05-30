@@ -12,7 +12,7 @@ module.exports = function Places () {
       _.each(that.places, function (place) {
         place.marker.setMap(null);
       });
-    };
+    }
 
     this.places = [];
 
