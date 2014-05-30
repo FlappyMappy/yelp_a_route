@@ -80,7 +80,6 @@ google.maps.event.addDomListener(window,'load',function() {
 
     calcRoute($("#start").val(), $("#destination").val(), function(res){
       //paint the route to the map
-      console.dir(res);
       paintRoute(res, mapObject.routeRenderer);
 
       //add the active route to the mapObject in full resolution
