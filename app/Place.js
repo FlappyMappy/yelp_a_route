@@ -1,11 +1,13 @@
-var placesDetailRequest = require('./placesDetailRequest');
-var _ = require('underscore');
-var template = require('./template.hbs');
+"use strict";
+var placesDetailRequest = require("./placesDetailRequest");
+var infoWindowTemplate = require("./template.hbs");
+var placelistTemplate = require("./placelist-template.hbs");
 var $ = require ("jquery");
+var ScrollTo = require("./vendor/jquery.scrollTo.min");
+$.scrollTo = new ScrollTo();
 
 module.exports = function Place (placeJSON, mapObject) {
   var that = this;
-
   this.marker = new google.maps.Marker({
     position: placeJSON.geometry.location,
     map: mapObject.map,
@@ -28,45 +30,50 @@ module.exports = function Place (placeJSON, mapObject) {
     placesDetailRequest(placeJSON.reference, mapObject.map, callback);
   };
 
-  // add click functionality to each list item
-  function expandListPlace() {
-    // remove any detail spans already open
+  // closes windows/placelist divs, makes detail request, calls other funcs
+  function makeRequest(result) {
     $(".places_details").remove();
-    var place = $("#" + placeJSON.reference);
-    that.detailRequest (function (result) {
-      // insert a span tag in the side panel containing the detailed text
-      $(place).after ("<div class='places_details'>" +
-                               result.vicinity +
-                      "<br>" + result.formatted_phone_number +
-                      "<br>" + result.rating + " / 5 Stars (" + result.user_ratings_total + " user reviews)" +
-                      "<br><a href='" + result.website + "' target='_newtab'>" + result.website + "</a>" +
-                      "<br><br>" + result.reviews[0].text +
-                      "<br><br>" + result.reviews[1].text +
-                      "</div>");
-    });
-  }
-
-  function infoWindow() {
     if (mapObject.openInfoWindow!==null){
       mapObject.openInfoWindow.close();
     }
-
-    that.detailRequest(function(result){
-      that.infoWindow = new google.maps.InfoWindow({
-        content: template(result)
-      });
-      mapObject.openInfoWindow = that.infoWindow;
-      mapObject.openInfoWindow.open(mapObject.map, that.marker);
+    that.detailRequest (function (result) {
+      console.dir(result);
+      var website = result.website;
+      if (website){
+        result.short_website = shortenWebsite(website);
+      }
+      infoWindow(result);
+      expandListPlace(result);
     });
   }
 
-  function infoWindowAndExpandList() {
-    expandListPlace();
-    infoWindow();
+  // passes result into info template, opens info window
+  function infoWindow(result) {
+    that.infoWindow = new google.maps.InfoWindow({
+      content: infoWindowTemplate(result)
+    });
+    mapObject.openInfoWindow = that.infoWindow;
+    mapObject.openInfoWindow.open(mapObject.map, that.marker);
   }
 
-  $("#" + placeJSON.reference).click(infoWindowAndExpandList);
+  // passes result into placelist template, appends to DOM and scrolls to it
+  function expandListPlace(result) {
+    var place = $("#" + placeJSON.reference);
+    place.after (placelistTemplate(result));
+    $(".list-display").scrollTo(place, 2000);
+  }
 
-  google.maps.event.addListener(this.marker, 'click', infoWindowAndExpandList);
+  // shorten (visible) url at first "/"" after http://
+  function shortenWebsite(website) {
+    if (website.length > 30){
+      var urlPieces = website.split("/");
+      return urlPieces[0] + "//" + urlPieces[2];
+    }
+    return website;
+  }
 
+  // placelist listener
+  $("#" + placeJSON.reference).click(makeRequest);
+  // marker listener
+  google.maps.event.addListener(this.marker, "click", makeRequest);
 };

@@ -10,6 +10,9 @@
       "beforeEach" : false,
       "after"      : false,
       "afterEach"  : false,
-      "equal"      : false
-    }
+      "equal"      : false,
+      "google"     : false
+    },
+  "undef": false,
+  "unused": false
 }
