@@ -30,6 +30,7 @@ header.top-bar
   font-weight: bold;
   font-size: 20pt;
   position: absolute;
+  height: 30px;
   width:100%;
   top: 10px;
   padding-top:10px;
@@ -309,6 +310,7 @@ div.places_details
   font-size: 10pt;
   border-radius: 10px;
   padding: 10px;
+  text-align: justify;
   }
 
 .infowindow-info
@@ -365,4 +367,15 @@ a:hover
 .button-color-B
   {
   background-color: rgb(255, 96, 96);
+  }
+
+img.logo
+  {
+  position: relative;
+  top: -50;
+  display: block;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  z-index: 30;
   }

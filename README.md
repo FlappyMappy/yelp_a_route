@@ -1,6 +1,8 @@
-yelp_a_route
+Flappy Mappy
 ============
 
-App to show user good yelp spots on the way to their destination.
+This is a web application to display Google Places along a route to a user's destination.
 
-[![Build Status](https://travis-ci.org/FlappyMappy/yelp_a_route.svg?branch=master)](https://travis-ci.org/FlappyMappy/yelp_a_route)
+This is a JavaScript app that used Google Map and Google Places APIs. If you're interested in looking at the code, we used Underscore, jQuery, Grunt, Express, Browserify, Casper, Mocha, Chai, jQuery scrollTo by Ariel Flesler.
+
+[![Build Status](https://api.shippable.com/projects/5388c96a5e755afa02b59e45/badge/master)](https://www.shippable.com/projects/5388c96a5e755afa02b59e45/builds/history)
