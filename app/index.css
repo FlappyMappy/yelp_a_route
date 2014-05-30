@@ -1,12 +1,12 @@
 html
-{
+  {
   width: 100%;
   height: 100%;
   position: absolute;
-}
+  }
 
 body
-{
+  {
   font-family: arial;
   background-color: rgb(64, 64, 64);
   background-image: url("background3.png");
@@ -19,10 +19,10 @@ body
   margin: 0px;
   padding: 0px;
   cursor: default;
-}
+  }
 
 header.top-bar
-{
+  {
   border-radius: 10px;
   color: black;
   text-align: center;
@@ -36,10 +36,10 @@ header.top-bar
   padding-top:10px;
   padding-bottom: 10px;
   box-shadow: 6px 6px 5px rgba(0, 0, 0, .75);
-}
+  }
 
 div.map-container
-{
+  {
   margin: 0;
   padding: 0;
   position: absolute;
@@ -47,20 +47,20 @@ div.map-container
   right: 425px;
   bottom: 40px;
   top: 75px;
-}
+  }
 
 div.hide
-{
+  {
   display: none;
-}
+  }
 
 div.show
-{
+  {
   display: inherit;
-}
+  }
 
 div.zoom-map
-{
+  {
   margin: 0px;
   padding: 0px;
   width: 100%;
@@ -70,14 +70,10 @@ div.zoom-map
   position: absolute;
   box-shadow: 6px 6px 5px rgba(0, 0, 0, .75);
   z-index: 10
-}
-
-.popup-search-box
-{
-}
+  }
 
 div.popup-search
-{
+  {
   margin: auto;
   width: 400px;
   height: 400px;
@@ -142,13 +138,12 @@ div.popup-search
     #list-box
     {
       display: none;
-      //visibility: hidden;
     }
   }
 
 
 .options-panel
-{
+  {
   margin: 15px;
   position: relative;
   float: left;
@@ -157,10 +152,10 @@ div.popup-search
   height: 220px;
   border-radius: 10px;
   padding: 10px;
-}
+  }
 
 .letter
-{
+  {
   color: black;
   font-weight: bold;
   font-size: 18pt;
@@ -171,22 +166,22 @@ div.popup-search
   border-radius: 20px;
   margin: 5px;
   box-shadow: 5px 5px 5px rgba(0, 0, 0, .5);
-}
+  }
 
 div.inputs
-{
+  {
   float: left;
   margin: 10px;
-}
+  }
 
 div #route-button-wrapper
-{
+  {
   padding-top: 10px;
   padding-left: 20px;
-}
+  }
 
 #route-button
-{
+  {
   color: black;
   text-align: center;
   font-size: 20pt;
@@ -198,37 +193,37 @@ div #route-button-wrapper
   height: 110px;
   box-shadow: 5px 5px 5px rgba(0, 0, 0, .5);
   cursor: pointer;
-}
+  }
 
 input.search-box
-{
+  {
   height: 40px;
   box-shadow: 5px 5px 5px rgba(0, 0, 0, .5);
   width: 195px;
   font-size: 16px;
   padding-left: 5px;
-}
+  }
 
 input#keyword
-{
+  {
   width: 336px;
   margin: 10px 0px 10px 0px;
-}
+  }
 
 div#left-options-box
-{
+  {
   float: left;
   width: 150px;
-}
+  }
 
 div#right-options-box
-{
+  {
   float: right;
   width: 150px;
-}
+  }
 
 div.list-display
-{
+  {
   background-color: white;
   left: 20px;
   right: 20px;
@@ -237,7 +232,23 @@ div.list-display
   position: absolute;
   top: 54px;
   bottom: 20px;
-}
+  }
+
+.list-header-info
+  {
+  text-align: right;
+  float: right;
+  font-size: 12px;
+  font-weight: none;
+  line-height: 16px;
+  }
+
+.list-icon
+  {
+  float: right;
+  height: 50px;
+  width: 50px;
+  }
 
 div.places_label
   {
@@ -252,7 +263,7 @@ div.places_label
   }
 
 div.bottom
-{
+  {
   vertical-align: middle;
   clear: both;
   color: white;
@@ -281,7 +292,7 @@ div.bottom
   left: 20px;
   }
 
-div.place_name
+.place-name
   {
   font-weight: bold;
   }

@@ -1,18 +1,27 @@
 <span class="infowindow-info">
   <div class="infotitle">{{name}}</div>
   {{vicinity}}
+
   <div class="infowindow-spaced">
+
     {{#if website}}
       <a href="{{website}}" target="_newtab">{{{short_website}}}</a> <br>
     {{/if}}
+
     {{formatted_phone_number}}
+
   </div>
+
   <div class="infowindow-spaced">
+
     {{#if rating}}
       Rating: {{rating}}/5
     {{/if}}
+
     {{#if url}}
       <a href="{{url}}" target="_newtab">  more info</a>
     {{/if}}
+
   </div>
+
 </span>

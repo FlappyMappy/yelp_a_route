@@ -1,7 +1,8 @@
 "use strict";
 var placesDetailRequest = require("./placesDetailRequest");
-var infoWindowTemplate = require("./template.hbs");
-var placelistTemplate = require("./placelist-template.hbs");
+var infoWindowTemplate = require("./templates/infowindow-template.hbs");
+var placelistTemplate = require("./templates/placelist-template.hbs");
+var placelistHeader = require("./templates/placelist-header-template.hbs");
 var $ = require ("jquery");
 var ScrollTo = require("./vendor/jquery.scrollTo.min");
 $.scrollTo = new ScrollTo();
@@ -19,32 +20,33 @@ module.exports = function Place (placeJSON, mapObject) {
       fillColor: "red"
     }
   });
-
-  this.element = "<div class='place_name' id='" + placeJSON.reference + "'>" +
-                   placeJSON.name + "</div><hr>";
+  this.element = placelistHeader(placeJSON);
 
   // add each place to the list display
   $(".list-display").append (this.element);
 
+  // defines the detail place request
   this.detailRequest = function detailRequest (callback) {
     placesDetailRequest(placeJSON.reference, mapObject.map, callback);
   };
 
-  // closes windows/placelist divs, makes detail request, calls other funcs
-  function makeRequest(result) {
-    $(".places_details").remove();
-    if (mapObject.openInfoWindow!==null){
-      mapObject.openInfoWindow.close();
-    }
-    that.detailRequest (function (result) {
-      console.dir(result);
-      var website = result.website;
-      if (website){
-        result.short_website = shortenWebsite(website);
+  // if the request placelist/infowindow is not already open
+  // close windows/placelist divs, make detail request, call other funcs
+  function makeRequest() {
+    if(mapObject.openInfoWindow !== that.infoWindow){
+      $(".places_details").remove();
+      if (mapObject.openInfoWindow!==null){
+        mapObject.openInfoWindow.close();
       }
-      infoWindow(result);
-      expandListPlace(result);
-    });
+      that.detailRequest (function (result) {
+        var website = result.website;
+        if (website){
+          result.short_website = shortenWebsite(website);
+        }
+        infoWindow(result);
+        expandListPlace(result);
+      });
+    }
   }
 
   // passes result into info template, opens info window
@@ -60,16 +62,16 @@ module.exports = function Place (placeJSON, mapObject) {
   function expandListPlace(result) {
     var place = $("#" + placeJSON.reference);
     place.after (placelistTemplate(result));
-    $(".list-display").scrollTo(place, 2000);
+    $(".list-display").scrollTo(place, 1000);
   }
 
-  // shorten (visible) url at first "/"" after http://
+  // shorten (visible) url at first "/" after http://
   function shortenWebsite(website) {
     if (website.length > 30){
       var urlPieces = website.split("/");
-      return urlPieces[0] + "//" + urlPieces[2];
+      return urlPieces[2];
     }
-    return website;
+    return website.substring(website.indexOf("//")+2, website.length-1);
   }
 
   // placelist listener
