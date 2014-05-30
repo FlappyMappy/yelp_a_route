@@ -2,6 +2,9 @@ var placesDetailRequest = require('./placesDetailRequest');
 var _ = require('underscore');
 var template = require('./template.hbs');
 var $ = require ("jquery");
+var jQuery = $;
+var ScrollTo = require("./vendor/jquery.scrollTo.min");
+$.scrollTo = new ScrollTo();
 
 module.exports = function Place (placeJSON, mapObject) {
   var that = this;
@@ -28,14 +31,14 @@ module.exports = function Place (placeJSON, mapObject) {
     placesDetailRequest(placeJSON.reference, mapObject.map, callback);
   };
 
-  // add click functionality to each list item
   function expandListPlace() {
     // remove any detail spans already open
     $(".places_details").remove();
     var place = $("#" + placeJSON.reference);
+
     that.detailRequest (function (result) {
       // insert a span tag in the side panel containing the detailed text
-      $(place).after ("<span class='places_details'>"
+      place.after ("<div class='places_details'>"
                         + "<br>" + result.vicinity
                         + "<br>" + result.formatted_phone_number
                         + "<br>" + result.rating + " / 5 Stars (" + result.user_ratings_total + " user reviews)"
@@ -43,6 +46,8 @@ module.exports = function Place (placeJSON, mapObject) {
                         + "<br><br>" + result.reviews[0].text
                         + "<br><br>" + result.reviews[1].text
                         + "</div>");
+    console.dir($(".list-display"));
+    $(".list-display").scrollTo(place, 2000);
     });
   };
 
