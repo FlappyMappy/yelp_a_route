@@ -24,8 +24,9 @@ module.exports = function mapObject (mapElement, mapOptions) {
 },{"./Places":3}],2:[function(require,module,exports){
 "use strict";
 var placesDetailRequest = require("./placesDetailRequest");
-var infoWindowTemplate = require("./template.hbs");
-var placelistTemplate = require("./placelist-template.hbs");
+var infoWindowTemplate = require("./templates/infowindow-template.hbs");
+var placelistTemplate = require("./templates/placelist-template.hbs");
+var placelistHeader = require("./templates/placelist-header-template.hbs");
 var $ = require ("./bower_components/jquery/dist/jquery.js");
 var ScrollTo = require("./vendor/jquery.scrollTo.min");
 $.scrollTo = new ScrollTo();
@@ -43,32 +44,33 @@ module.exports = function Place (placeJSON, mapObject) {
       fillColor: "red"
     }
   });
-
-  this.element = "<div class='place_name' id='" + placeJSON.reference + "'>" +
-                   placeJSON.name + "</div><hr>";
+  this.element = placelistHeader(placeJSON);
 
   // add each place to the list display
   $(".list-display").append (this.element);
 
+  // defines the detail place request
   this.detailRequest = function detailRequest (callback) {
     placesDetailRequest(placeJSON.reference, mapObject.map, callback);
   };
 
-  // closes windows/placelist divs, makes detail request, calls other funcs
-  function makeRequest(result) {
-    $(".places_details").remove();
-    if (mapObject.openInfoWindow!==null){
-      mapObject.openInfoWindow.close();
-    }
-    that.detailRequest (function (result) {
-      console.dir(result);
-      var website = result.website;
-      if (website){
-        result.short_website = shortenWebsite(website);
+  // if the request placelist/infowindow is not already open
+  // close windows/placelist divs, make detail request, call other funcs
+  function makeRequest() {
+    if(mapObject.openInfoWindow !== that.infoWindow){
+      $(".places_details").remove();
+      if (mapObject.openInfoWindow!==null){
+        mapObject.openInfoWindow.close();
       }
-      infoWindow(result);
-      expandListPlace(result);
-    });
+      that.detailRequest (function (result) {
+        var website = result.website;
+        if (website){
+          result.short_website = shortenWebsite(website);
+        }
+        infoWindow(result);
+        expandListPlace(result);
+      });
+    }
   }
 
   // passes result into info template, opens info window
@@ -84,16 +86,16 @@ module.exports = function Place (placeJSON, mapObject) {
   function expandListPlace(result) {
     var place = $("#" + placeJSON.reference);
     place.after (placelistTemplate(result));
-    $(".list-display").scrollTo(place, 2000);
+    $(".list-display").scrollTo(place, 1000);
   }
 
-  // shorten (visible) url at first "/"" after http://
+  // shorten (visible) url at first "/" after http://
   function shortenWebsite(website) {
     if (website.length > 30){
       var urlPieces = website.split("/");
-      return urlPieces[0] + "//" + urlPieces[2];
+      return urlPieces[2];
     }
-    return website;
+    return website.substring(website.indexOf("//")+2, website.length-1);
   }
 
   // placelist listener
@@ -102,7 +104,7 @@ module.exports = function Place (placeJSON, mapObject) {
   google.maps.event.addListener(this.marker, "click", makeRequest);
 };
 
-},{"./bower_components/jquery/dist/jquery.js":6,"./placelist-template.hbs":15,"./placesDetailRequest":16,"./template.hbs":20,"./vendor/jquery.scrollTo.min":22}],3:[function(require,module,exports){
+},{"./bower_components/jquery/dist/jquery.js":6,"./placesDetailRequest":15,"./templates/infowindow-template.hbs":19,"./templates/placelist-header-template.hbs":20,"./templates/placelist-template.hbs":21,"./vendor/jquery.scrollTo.min":23}],3:[function(require,module,exports){
 var _ = require ("./bower_components/underscore/underscore.js");
 var Place = require('./Place');
 var $ = require ("./bower_components/jquery/dist/jquery.js");
@@ -112,7 +114,7 @@ module.exports = function Places () {
   var that = this;
 
   this.clearPlaces = function clearPlaces () {
-    
+
     if (that.places.length>0){
       _.each(that.places, function (place) {
         place.marker.setMap(null);
@@ -126,12 +128,13 @@ module.exports = function Places () {
   };
 
   this.addPlace = function addPlace (placeJSON, mapObject) {
-    this.places.push(new Place(placeJSON, mapObject));
+    if(placeJSON.types[0] !== "neighborhood" && placeJSON.types[0] !== "locality") {
+      this.places.push(new Place(placeJSON, mapObject));
+    }
   };
 };
 
 },{"./Place":2,"./bower_components/jquery/dist/jquery.js":6,"./bower_components/underscore/underscore.js":7}],4:[function(require,module,exports){
-
 var $ = require("./bower_components/jquery/dist/jquery.js");
 var _ = require("./bower_components/underscore/underscore.js");
 
@@ -229,11 +232,10 @@ google.maps.event.addDomListener(window,'load',function() {
       mapObject.map.setZoom(11);
 
     }, mapObject.map);
-
   });
 });
 
-},{"./MapObject":1,"./Places":3,"./bower_components/jquery/dist/jquery.js":6,"./bower_components/underscore/underscore.js":7,"./calcRoute":8,"./paintRoute":12,"./panToReload":13,"./parseFullPath":14,"./placesDetailRequest":16,"./populatePlaces":19}],5:[function(require,module,exports){
+},{"./MapObject":1,"./Places":3,"./bower_components/jquery/dist/jquery.js":6,"./bower_components/underscore/underscore.js":7,"./calcRoute":8,"./paintRoute":12,"./panToReload":13,"./parseFullPath":14,"./placesDetailRequest":15,"./populatePlaces":18}],5:[function(require,module,exports){
 "use strict";
 /*global google:false */
 //Function takes an array of bounding boxes and options and
@@ -10853,8 +10855,6 @@ module.exports = function calcRoute(start, end, callback, map) {
     });
 };
 
-
-
 },{}],9:[function(require,module,exports){
 //takes a bounding box and a polyline and
 //returns a new polyline where span between
@@ -10943,7 +10943,7 @@ module.exports = function panToReload (mapObject) {
 
 	
 };
-},{"./clipPolylineToDestination":9,"./populatePlaces":19}],14:[function(require,module,exports){
+},{"./clipPolylineToDestination":9,"./populatePlaces":18}],14:[function(require,module,exports){
 //parses the full resolution path polyline
 //from a routes result object. This is instead
 //of using overview polyline which is a low resolution
@@ -10968,86 +10968,6 @@ module.exports = function parseFullPath(route) {
 };
 
 },{}],15:[function(require,module,exports){
-// hbsfy compiled Handlebars template
-var Handlebars = require('hbsfy/runtime');
-module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n    Rating: ";
-  if (helper = helpers.rating) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.rating); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + " / 5 Stars (";
-  if (helper = helpers.user_ratings_total) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.user_ratings_total); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + " user reviews)<br>\n  ";
-  return buffer;
-  }
-
-function program3(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n    <a href='";
-  if (helper = helpers.website) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.website); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "' target='_newtab'>";
-  if (helper = helpers.short_website) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.short_website); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "</a>\n  ";
-  return buffer;
-  }
-
-function program5(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\n      <a href=\"";
-  if (helper = helpers.url) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.url); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" target=\"_newtab\">  more info</a>\n  ";
-  return buffer;
-  }
-
-  buffer += "<div class='places_details'>\n  <img style=\"float: right; height=10px; width=10px;\" src=\"";
-  if (helper = helpers.icon) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.icon); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\">\n  ";
-  if (helper = helpers.vicinity) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.vicinity); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "<br>\n  ";
-  if (helper = helpers.formatted_phone_number) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.formatted_phone_number); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "<br>\n  ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.rating), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n  ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.website), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n  <br><br>\n  ";
-  stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 && depth0.reviews)),stack1 == null || stack1 === false ? stack1 : stack1[0])),stack1 == null || stack1 === false ? stack1 : stack1.text)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " <br><hr>\n  ";
-  stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 && depth0.reviews)),stack1 == null || stack1 === false ? stack1 : stack1[1])),stack1 == null || stack1 === false ? stack1 : stack1.text)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += " <br><br>\n  ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.url), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</div>\n\n";
-  return buffer;
-  });
-
-},{"hbsfy/runtime":30}],16:[function(require,module,exports){
 //this method takes a unique places ID
 //and requests details from google maps
 //and passes results to callback
@@ -11070,7 +10990,7 @@ module.exports = function placesDetailRequest(placeID, map, callback) {
 
 };
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 //This function will take a polyline and return a polyline
 //that starts at mile startMile and ends at
 //endMile
@@ -11102,7 +11022,7 @@ module.exports = function polylineMileSplit(polyline, startMile, endMile){
 	return newPolyline;
 };
 
-},{"./milesToMeters":11}],18:[function(require,module,exports){
+},{"./milesToMeters":11}],17:[function(require,module,exports){
 //polyline is an array of google.maps.Point objects
 //dist is distance from polyline in km that Bounding Boxes will
 //surround
@@ -11118,7 +11038,7 @@ module.exports = function polylineToBBox(polyline, dist){
     return (new RouteBoxer()).box(polyline, dist); //JSHINT: missing () invoking a constructor
 };
 
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 var polylineMileSplit = require('./polylineMileSplit');
 var polylineToBBox = require('./polylineToBBox');
 var bboxToPlacesReqArr = require('./bboxToPlacesReqArr');
@@ -11140,7 +11060,7 @@ module.exports = function populatePlaces (polyline, mapObject, startMiles) {
         });
       });
 };
-},{"./bboxToPlacesReqArr":5,"./bower_components/underscore/underscore.js":7,"./executePlacesReqArr":10,"./polylineMileSplit":17,"./polylineToBBox":18}],20:[function(require,module,exports){
+},{"./bboxToPlacesReqArr":5,"./bower_components/underscore/underscore.js":7,"./executePlacesReqArr":10,"./polylineMileSplit":16,"./polylineToBBox":17}],19:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -11193,24 +11113,158 @@ function program5(depth0,data) {
   if (helper = helpers.vicinity) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.vicinity); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\n  <div class=\"infowindow-spaced\">\n    ";
+    + "\n\n  <div class=\"infowindow-spaced\">\n\n    ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.website), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    ";
+  buffer += "\n\n    ";
   if (helper = helpers.formatted_phone_number) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.formatted_phone_number); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\n  </div>\n  <div class=\"infowindow-spaced\">\n    ";
+    + "\n\n  </div>\n\n  <div class=\"infowindow-spaced\">\n\n    ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.rating), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    ";
+  buffer += "\n\n    ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.url), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n  </div>\n</span>\n";
+  buffer += "\n\n  </div>\n\n</span>\n";
   return buffer;
   });
 
-},{"hbsfy/runtime":30}],21:[function(require,module,exports){
+},{"hbsfy/runtime":31}],20:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\n      ";
+  if (helper = helpers.rating) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.rating); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "/5\n    ";
+  return buffer;
+  }
+
+  buffer += "<div class=\"place-name\" id=\"";
+  if (helper = helpers.reference) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.reference); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\">\n  ";
+  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\n  <div class=\"list-header-info\">\n    ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.rating), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n  </div>\n</div>\n\n<hr>\n";
+  return buffer;
+  });
+
+},{"hbsfy/runtime":31}],21:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\n    Rating: ";
+  if (helper = helpers.rating) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.rating); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + " / 5 Stars (";
+  if (helper = helpers.user_ratings_total) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.user_ratings_total); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + " user reviews)<br>\n  ";
+  return buffer;
+  }
+
+function program3(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\n    <a href='";
+  if (helper = helpers.website) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.website); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "' target='_newtab'>";
+  if (helper = helpers.short_website) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.short_website); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</a>\n    <br>\n  ";
+  return buffer;
+  }
+
+function program5(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n    <br>\n    ";
+  stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 && depth0.reviews)),stack1 == null || stack1 === false ? stack1 : stack1[0])),stack1 == null || stack1 === false ? stack1 : stack1.text)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n    <br>\n  ";
+  return buffer;
+  }
+
+function program7(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n    <hr>\n    ";
+  stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 && depth0.reviews)),stack1 == null || stack1 === false ? stack1 : stack1[1])),stack1 == null || stack1 === false ? stack1 : stack1.text)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n    <br>\n  ";
+  return buffer;
+  }
+
+function program9(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\n      <a href=\"";
+  if (helper = helpers.url) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.url); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" target=\"_newtab\">  more info</a>\n  ";
+  return buffer;
+  }
+
+  buffer += "<div class='places_details'>\n  <img class=\"list-icon\" src=\"";
+  if (helper = helpers.icon) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.icon); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\">\n\n  ";
+  if (helper = helpers.vicinity) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.vicinity); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\n  <br>\n\n  ";
+  if (helper = helpers.formatted_phone_number) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.formatted_phone_number); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\n  <br>\n\n  ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.rating), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n  ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.website), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n  ";
+  stack1 = helpers['if'].call(depth0, ((stack1 = ((stack1 = (depth0 && depth0.reviews)),stack1 == null || stack1 === false ? stack1 : stack1[0])),stack1 == null || stack1 === false ? stack1 : stack1.text), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n  ";
+  stack1 = helpers['if'].call(depth0, ((stack1 = ((stack1 = (depth0 && depth0.reviews)),stack1 == null || stack1 === false ? stack1 : stack1[1])),stack1 == null || stack1 === false ? stack1 : stack1.text), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n  <br>\n\n  ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.url), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n</div>\n\n";
+  return buffer;
+  });
+
+},{"hbsfy/runtime":31}],22:[function(require,module,exports){
 var $ = require ("./bower_components/jquery/dist/jquery.js");
 
 // if the user clicks the toggle bar
@@ -11229,7 +11283,7 @@ $("#toggle-bar").click (function ()
   $("#list-box").fadeToggle();
 });
 
-},{"./bower_components/jquery/dist/jquery.js":6}],22:[function(require,module,exports){
+},{"./bower_components/jquery/dist/jquery.js":6}],23:[function(require,module,exports){
 /**
  * Copyright (c) 2007-2014 Ariel Flesler - aflesler<a>gmail<d>com | http://flesler.blogspot.com
  * Licensed under MIT
@@ -11240,7 +11294,7 @@ var $ = require("./../bower_components/jquery/dist/jquery.js");
 
 module.exports = function(){var j=$.scrollTo=function(a,b,c){return $(window).scrollTo(a,b,c)};j.defaults={axis:'xy',duration:parseFloat($.fn.jquery)>=1.3?0:1,limit:true};j.window=function(a){return $(window)._scrollable()};$.fn._scrollable=function(){return this.map(function(){var a=this,isWin=!a.nodeName||$.inArray(a.nodeName.toLowerCase(),['iframe','#document','html','body'])!=-1;if(!isWin)return a;var b=(a.contentWindow||a).document||a.ownerDocument||a;return/webkit/i.test(navigator.userAgent)||b.compatMode=='BackCompat'?b.body:b.documentElement})};$.fn.scrollTo=function(f,g,h){if(typeof g=='object'){h=g;g=0}if(typeof h=='function')h={onAfter:h};if(f=='max')f=9e9;h=$.extend({},j.defaults,h);g=g||h.duration;h.queue=h.queue&&h.axis.length>1;if(h.queue)g/=2;h.offset=both(h.offset);h.over=both(h.over);return this._scrollable().each(function(){if(f==null)return;var d=this,$elem=$(d),targ=f,toff,attr={},win=$elem.is('html,body');switch(typeof targ){case'number':case'string':if(/^([+-]=?)?\d+(\.\d+)?(px|%)?$/.test(targ)){targ=both(targ);break}targ=win?$(targ):$(targ,this);if(!targ.length)return;case'object':if(targ.is||targ.style)toff=(targ=$(targ)).offset()}var e=$.isFunction(h.offset)&&h.offset(d,targ)||h.offset;$.each(h.axis.split(''),function(i,a){var b=a=='x'?'Left':'Top',pos=b.toLowerCase(),key='scroll'+b,old=d[key],max=j.max(d,a);if(toff){attr[key]=toff[pos]+(win?0:old-$elem.offset()[pos]);if(h.margin){attr[key]-=parseInt(targ.css('margin'+b))||0;attr[key]-=parseInt(targ.css('border'+b+'Width'))||0}attr[key]+=e[pos]||0;if(h.over[pos])attr[key]+=targ[a=='x'?'width':'height']()*h.over[pos]}else{var c=targ[pos];attr[key]=c.slice&&c.slice(-1)=='%'?parseFloat(c)/100*max:c}if(h.limit&&/^\d+$/.test(attr[key]))attr[key]=attr[key]<=0?0:Math.min(attr[key],max);if(!i&&h.queue){if(old!=attr[key])animate(h.onAfterFirst);delete attr[key]}});animate(h.onAfter);function animate(a){$elem.animate(attr,g,h.easing,a&&function(){a.call(this,targ,h)})}}).end()};j.max=function(a,b){var c=b=='x'?'Width':'Height',scroll='scroll'+c;if(!$(a).is('html,body'))return a[scroll]-$(a)[c.toLowerCase()]();var d='client'+c,html=a.ownerDocument.documentElement,body=a.ownerDocument.body;return Math.max(html[scroll],body[scroll])-Math.min(html[d],body[d])};function both(a){return $.isFunction(a)||typeof a=='object'?a:{top:a,left:a}};return j};
 
-},{"./../bower_components/jquery/dist/jquery.js":6}],23:[function(require,module,exports){
+},{"./../bower_components/jquery/dist/jquery.js":6}],24:[function(require,module,exports){
 "use strict";
 /*globals Handlebars: true */
 var base = require("./handlebars/base");
@@ -11273,7 +11327,7 @@ var Handlebars = create();
 Handlebars.create = create;
 
 exports["default"] = Handlebars;
-},{"./handlebars/base":24,"./handlebars/exception":25,"./handlebars/runtime":26,"./handlebars/safe-string":27,"./handlebars/utils":28}],24:[function(require,module,exports){
+},{"./handlebars/base":25,"./handlebars/exception":26,"./handlebars/runtime":27,"./handlebars/safe-string":28,"./handlebars/utils":29}],25:[function(require,module,exports){
 "use strict";
 var Utils = require("./utils");
 var Exception = require("./exception")["default"];
@@ -11454,7 +11508,7 @@ exports.log = log;var createFrame = function(object) {
   return obj;
 };
 exports.createFrame = createFrame;
-},{"./exception":25,"./utils":28}],25:[function(require,module,exports){
+},{"./exception":26,"./utils":29}],26:[function(require,module,exports){
 "use strict";
 
 var errorProps = ['description', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
@@ -11483,7 +11537,7 @@ function Exception(message, node) {
 Exception.prototype = new Error();
 
 exports["default"] = Exception;
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 var Utils = require("./utils");
 var Exception = require("./exception")["default"];
@@ -11621,7 +11675,7 @@ exports.program = program;function invokePartial(partial, name, context, helpers
 exports.invokePartial = invokePartial;function noop() { return ""; }
 
 exports.noop = noop;
-},{"./base":24,"./exception":25,"./utils":28}],27:[function(require,module,exports){
+},{"./base":25,"./exception":26,"./utils":29}],28:[function(require,module,exports){
 "use strict";
 // Build out our basic SafeString type
 function SafeString(string) {
@@ -11633,7 +11687,7 @@ SafeString.prototype.toString = function() {
 };
 
 exports["default"] = SafeString;
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 /*jshint -W004 */
 var SafeString = require("./safe-string")["default"];
@@ -11710,12 +11764,12 @@ exports.escapeExpression = escapeExpression;function isEmpty(value) {
 }
 
 exports.isEmpty = isEmpty;
-},{"./safe-string":27}],29:[function(require,module,exports){
+},{"./safe-string":28}],30:[function(require,module,exports){
 // Create a simple path alias to allow browserify to resolve
 // the runtime on a supported path.
 module.exports = require('./dist/cjs/handlebars.runtime');
 
-},{"./dist/cjs/handlebars.runtime":23}],30:[function(require,module,exports){
+},{"./dist/cjs/handlebars.runtime":24}],31:[function(require,module,exports){
 module.exports = require("handlebars/runtime")["default"];
 
-},{"handlebars/runtime":29}]},{},[1,2,3,4,5,8,9,10,11,12,13,14,16,17,18,19,21])
+},{"handlebars/runtime":30}]},{},[1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,22])
