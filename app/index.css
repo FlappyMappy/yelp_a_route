@@ -248,6 +248,7 @@ div.list-display
   float: right;
   height: 50px;
   width: 50px;
+  padding-top: 3px;
   }
 
 div.places_label
@@ -309,8 +310,9 @@ div.places_details
   background-color: rgb(192, 224, 255);
   font-size: 10pt;
   border-radius: 10px;
-  padding: 10px;
+  padding: 13px;
   text-align: justify;
+  font-weight: normal;
   }
 
 .infowindow-info

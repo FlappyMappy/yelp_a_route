@@ -2,13 +2,14 @@
 var placesDetailRequest = require("./placesDetailRequest");
 var infoWindowTemplate = require("./templates/infowindow-template.hbs");
 var placelistTemplate = require("./templates/placelist-template.hbs");
-var placelistHeader = require("./templates/placelist-header-template.hbs");
+var placelistHeaderTemplate = require("./templates/placelist-header-template.hbs");
 var $ = require ("jquery");
 var ScrollTo = require("./vendor/jquery.scrollTo.min");
 $.scrollTo = new ScrollTo();
 
 module.exports = function Place (placeJSON, mapObject) {
   var that = this;
+  //creates new marker on map
   this.marker = new google.maps.Marker({
     position: placeJSON.geometry.location,
     map: mapObject.map,
@@ -20,10 +21,15 @@ module.exports = function Place (placeJSON, mapObject) {
       fillColor: "red"
     }
   });
-  this.element = placelistHeader(placeJSON);
+  this.element = placelistHeaderTemplate(placeJSON);
 
   // add each place to the list display
   $(".list-display").append (this.element);
+
+  // placelist listener
+  $("#" + placeJSON.reference).click(makeRequest);
+  // marker listener
+  google.maps.event.addListener(this.marker, "click", makeRequest);
 
   // defines the detail place request
   this.detailRequest = function detailRequest (callback) {
@@ -60,22 +66,34 @@ module.exports = function Place (placeJSON, mapObject) {
 
   // passes result into placelist template, appends to DOM and scrolls to it
   function expandListPlace(result) {
-    var place = $("#" + placeJSON.reference);
-    place.after (placelistTemplate(result));
-    $(".list-display").scrollTo(place, 1000);
-  }
-
-  // shorten (visible) url at first "/" after http://
-  function shortenWebsite(website) {
-    if (website.length > 30){
-      var urlPieces = website.split("/");
-      return urlPieces[2];
+    $("#" + placeJSON.reference).append(placelistTemplate(result));
+    var images = $(".images");
+    if(result.photos){
+      for(var i = 0; i < 3; i++){
+        if(result.photos[i]){
+          images.prepend("<img class='small-image' id='photo-" + i + "' src='" +
+          result.photos[i].getUrl({"maxWidth": 100, "maxHeight": 70}) +
+          "'>   ");
+        }
+      }
     }
-    return website.substring(website.indexOf("//")+2, website.length-1);
+    $(".places_details").slideUp(0);
+    $(".places_details").slideDown(500);
+    $(".list-display").scrollTo($("#" + placeJSON.reference), 1000);
   }
 
-  // placelist listener
-  $("#" + placeJSON.reference).click(makeRequest);
-  // marker listener
-  google.maps.event.addListener(this.marker, "click", makeRequest);
+  //show photos big //right now only console-logs which photos was clicked
+  $("#" + placeJSON.reference).on("click", ".small-image", function(){
+    console.log($(this).prop("id"));
+  });
+
+  // cut off http://www and anything after the domain name
+  function shortenWebsite(website) {
+    var UrlParts = website.split("/");
+    var shortUrl = UrlParts[2];
+    if(shortUrl.indexOf("www") >= 0){
+      return shortUrl.substring(4);
+    }
+    return shortUrl;
+  }
 };
