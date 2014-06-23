@@ -26,13 +26,14 @@ module.exports = function mapObject (mapElement, mapOptions) {
 var placesDetailRequest = require("./placesDetailRequest");
 var infoWindowTemplate = require("./templates/infowindow-template.hbs");
 var placelistTemplate = require("./templates/placelist-template.hbs");
-var placelistHeader = require("./templates/placelist-header-template.hbs");
+var placelistHeaderTemplate = require("./templates/placelist-header-template.hbs");
 var $ = require ("./bower_components/jquery/dist/jquery.js");
 var ScrollTo = require("./vendor/jquery.scrollTo.min");
 $.scrollTo = new ScrollTo();
 
 module.exports = function Place (placeJSON, mapObject) {
   var that = this;
+  //creates new marker on map
   this.marker = new google.maps.Marker({
     position: placeJSON.geometry.location,
     map: mapObject.map,
@@ -44,10 +45,15 @@ module.exports = function Place (placeJSON, mapObject) {
       fillColor: "red"
     }
   });
-  this.element = placelistHeader(placeJSON);
+  this.element = placelistHeaderTemplate(placeJSON);
 
   // add each place to the list display
   $(".list-display").append (this.element);
+
+  // placelist listener
+  $("#" + placeJSON.reference).click(makeRequest);
+  // marker listener
+  google.maps.event.addListener(this.marker, "click", makeRequest);
 
   // defines the detail place request
   this.detailRequest = function detailRequest (callback) {
@@ -84,27 +90,39 @@ module.exports = function Place (placeJSON, mapObject) {
 
   // passes result into placelist template, appends to DOM and scrolls to it
   function expandListPlace(result) {
-    var place = $("#" + placeJSON.reference);
-    place.after (placelistTemplate(result));
-    $(".list-display").scrollTo(place, 1000);
-  }
-
-  // shorten (visible) url at first "/" after http://
-  function shortenWebsite(website) {
-    if (website.length > 30){
-      var urlPieces = website.split("/");
-      return urlPieces[2];
+    $("#" + placeJSON.reference).append(placelistTemplate(result));
+    var images = $(".images");
+    if(result.photos){
+      for(var i = 0; i < 3; i++){
+        if(result.photos[i]){
+          images.prepend("<img class='small-image' id='photo-" + i + "' src='" +
+          result.photos[i].getUrl({"maxWidth": 100, "maxHeight": 70}) +
+          "'>   ");
+        }
+      }
     }
-    return website.substring(website.indexOf("//")+2, website.length-1);
+    $(".places_details").slideUp(0);
+    $(".places_details").slideDown(500);
+    $(".list-display").scrollTo($("#" + placeJSON.reference), 1000);
   }
 
-  // placelist listener
-  $("#" + placeJSON.reference).click(makeRequest);
-  // marker listener
-  google.maps.event.addListener(this.marker, "click", makeRequest);
+  //show photos big //right now only console-logs which photos was clicked
+  $("#" + placeJSON.reference).on("click", ".small-image", function(){
+    console.log($(this).prop("id"));
+  });
+
+  // cut off http://www and anything after the domain name
+  function shortenWebsite(website) {
+    var UrlParts = website.split("/");
+    var shortUrl = UrlParts[2];
+    if(shortUrl.indexOf("www") >= 0){
+      return shortUrl.substring(4);
+    }
+    return shortUrl;
+  }
 };
 
-},{"./bower_components/jquery/dist/jquery.js":6,"./placesDetailRequest":15,"./templates/infowindow-template.hbs":19,"./templates/placelist-header-template.hbs":20,"./templates/placelist-template.hbs":21,"./vendor/jquery.scrollTo.min":23}],3:[function(require,module,exports){
+},{"./bower_components/jquery/dist/jquery.js":6,"./placesDetailRequest":16,"./templates/infowindow-template.hbs":20,"./templates/placelist-header-template.hbs":21,"./templates/placelist-template.hbs":22,"./vendor/jquery.scrollTo.min":24}],3:[function(require,module,exports){
 var _ = require ("./bower_components/underscore/underscore.js");
 var Place = require('./Place');
 var $ = require ("./bower_components/jquery/dist/jquery.js");
@@ -235,7 +253,7 @@ google.maps.event.addDomListener(window,'load',function() {
   });
 });
 
-},{"./MapObject":1,"./Places":3,"./bower_components/jquery/dist/jquery.js":6,"./bower_components/underscore/underscore.js":7,"./calcRoute":8,"./paintRoute":12,"./panToReload":13,"./parseFullPath":14,"./placesDetailRequest":15,"./populatePlaces":18}],5:[function(require,module,exports){
+},{"./MapObject":1,"./Places":3,"./bower_components/jquery/dist/jquery.js":6,"./bower_components/underscore/underscore.js":7,"./calcRoute":8,"./paintRoute":13,"./panToReload":14,"./parseFullPath":15,"./placesDetailRequest":16,"./populatePlaces":19}],5:[function(require,module,exports){
 "use strict";
 /*global google:false */
 //Function takes an array of bounding boxes and options and
@@ -259,42 +277,42 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 
 	for (i=0; i<bboxArray.length; i++) {
 
-		var req = getReqFunction(bboxArray[i]);
+		//create shallow copy of options
+		//and add bounds property
+		var reqOptions = {};
+
+		for (var key in options){
+			reqOptions[key] = options[key];
+		}
+		reqOptions.bounds = bboxArray[i];
+
+		var req = getReqFunction(reqOptions);
 
 		reqArr.push(req);
 	}
 
+	return reqArr;
 
-	function getReqFunction (bbox) {
-		return (function() {
-			var reqOptions = {
-				types: options.types,
-				keyword: options.keyword,
-				openNow: options.openNow,
-				minPriceLevel: options.minPriceLevel,
-				maxPriceLevel: options.maxPriceLevel
-			};
 
-			reqOptions.bounds = bbox;
+	function getReqFunction (reqOptions) {
 
-			return function(callback) {
+		return function(callback) {
 
-				service.nearbySearch(reqOptions, function(result, status, pagination) {
+			service.nearbySearch(reqOptions, function(result, status, pagination) {
 
-					if (status == google.maps.places.PlacesServiceStatus.OK){
+				if (status == google.maps.places.PlacesServiceStatus.OK){
 
-						callback(result, pagination, map);
+					callback(result, pagination);
 
-					} else {
+				} else {
 
-						throw("BBox to Places request failed:" + status);
-					}
-				});
-			};
-		})();
+					throw("BBox to Places request failed:" + status);
+				}
+			});
+		};
 	}
 
-	return reqArr;
+
 };
 
 },{}],6:[function(require,module,exports){
@@ -10906,12 +10924,14 @@ module.exports = function executePlacesReqArr(reqArr, callback){
 	makeReq();
 };
 },{}],11:[function(require,module,exports){
+
+},{}],12:[function(require,module,exports){
 //method to convert from miles to meters.
 //Returns integer of meters
 module.exports = function milesToMeters(miles) {
 	return parseInt(miles * 1609.34);
 };
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 
 //paint the route
 module.exports = function paintRoute (routes, routeRenderer) {
@@ -10920,7 +10940,7 @@ module.exports = function paintRoute (routes, routeRenderer) {
   }
 };
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 
 var clipPolylineToDestination = require('./clipPolylineToDestination');
 var populatePlaces = require('./populatePlaces');
@@ -10943,7 +10963,7 @@ module.exports = function panToReload (mapObject) {
 
 	
 };
-},{"./clipPolylineToDestination":9,"./populatePlaces":18}],14:[function(require,module,exports){
+},{"./clipPolylineToDestination":9,"./populatePlaces":19}],15:[function(require,module,exports){
 //parses the full resolution path polyline
 //from a routes result object. This is instead
 //of using overview polyline which is a low resolution
@@ -10967,7 +10987,7 @@ module.exports = function parseFullPath(route) {
 
 };
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 //this method takes a unique places ID
 //and requests details from google maps
 //and passes results to callback
@@ -10990,7 +11010,7 @@ module.exports = function placesDetailRequest(placeID, map, callback) {
 
 };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 //This function will take a polyline and return a polyline
 //that starts at mile startMile and ends at
 //endMile
@@ -11022,7 +11042,7 @@ module.exports = function polylineMileSplit(polyline, startMile, endMile){
 	return newPolyline;
 };
 
-},{"./milesToMeters":11}],17:[function(require,module,exports){
+},{"./milesToMeters":12}],18:[function(require,module,exports){
 //polyline is an array of google.maps.Point objects
 //dist is distance from polyline in km that Bounding Boxes will
 //surround
@@ -11038,7 +11058,7 @@ module.exports = function polylineToBBox(polyline, dist){
     return (new RouteBoxer()).box(polyline, dist); //JSHINT: missing () invoking a constructor
 };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var polylineMileSplit = require('./polylineMileSplit');
 var polylineToBBox = require('./polylineToBBox');
 var bboxToPlacesReqArr = require('./bboxToPlacesReqArr');
@@ -11060,7 +11080,7 @@ module.exports = function populatePlaces (polyline, mapObject, startMiles) {
         });
       });
 };
-},{"./bboxToPlacesReqArr":5,"./bower_components/underscore/underscore.js":7,"./executePlacesReqArr":10,"./polylineMileSplit":16,"./polylineToBBox":17}],19:[function(require,module,exports){
+},{"./bboxToPlacesReqArr":5,"./bower_components/underscore/underscore.js":7,"./executePlacesReqArr":10,"./polylineMileSplit":17,"./polylineToBBox":18}],20:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -11130,7 +11150,7 @@ function program5(depth0,data) {
   return buffer;
   });
 
-},{"hbsfy/runtime":31}],20:[function(require,module,exports){
+},{"hbsfy/runtime":32}],21:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -11164,7 +11184,7 @@ function program1(depth0,data) {
   return buffer;
   });
 
-},{"hbsfy/runtime":31}],21:[function(require,module,exports){
+},{"hbsfy/runtime":32}],22:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -11233,7 +11253,7 @@ function program9(depth0,data) {
   return buffer;
   }
 
-  buffer += "<div class='places_details'>\n  <img class=\"list-icon\" src=\"";
+  buffer += "<div class='places_details'>\n  <div class=\"images\"></div>\n  <img class=\"list-icon\" src=\"";
   if (helper = helpers.icon) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.icon); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -11264,7 +11284,7 @@ function program9(depth0,data) {
   return buffer;
   });
 
-},{"hbsfy/runtime":31}],22:[function(require,module,exports){
+},{"hbsfy/runtime":32}],23:[function(require,module,exports){
 var $ = require ("./bower_components/jquery/dist/jquery.js");
 
 // if the user clicks the toggle bar
@@ -11283,7 +11303,7 @@ $("#toggle-bar").click (function ()
   $("#list-box").fadeToggle();
 });
 
-},{"./bower_components/jquery/dist/jquery.js":6}],23:[function(require,module,exports){
+},{"./bower_components/jquery/dist/jquery.js":6}],24:[function(require,module,exports){
 /**
  * Copyright (c) 2007-2014 Ariel Flesler - aflesler<a>gmail<d>com | http://flesler.blogspot.com
  * Licensed under MIT
@@ -11294,7 +11314,7 @@ var $ = require("./../bower_components/jquery/dist/jquery.js");
 
 module.exports = function(){var j=$.scrollTo=function(a,b,c){return $(window).scrollTo(a,b,c)};j.defaults={axis:'xy',duration:parseFloat($.fn.jquery)>=1.3?0:1,limit:true};j.window=function(a){return $(window)._scrollable()};$.fn._scrollable=function(){return this.map(function(){var a=this,isWin=!a.nodeName||$.inArray(a.nodeName.toLowerCase(),['iframe','#document','html','body'])!=-1;if(!isWin)return a;var b=(a.contentWindow||a).document||a.ownerDocument||a;return/webkit/i.test(navigator.userAgent)||b.compatMode=='BackCompat'?b.body:b.documentElement})};$.fn.scrollTo=function(f,g,h){if(typeof g=='object'){h=g;g=0}if(typeof h=='function')h={onAfter:h};if(f=='max')f=9e9;h=$.extend({},j.defaults,h);g=g||h.duration;h.queue=h.queue&&h.axis.length>1;if(h.queue)g/=2;h.offset=both(h.offset);h.over=both(h.over);return this._scrollable().each(function(){if(f==null)return;var d=this,$elem=$(d),targ=f,toff,attr={},win=$elem.is('html,body');switch(typeof targ){case'number':case'string':if(/^([+-]=?)?\d+(\.\d+)?(px|%)?$/.test(targ)){targ=both(targ);break}targ=win?$(targ):$(targ,this);if(!targ.length)return;case'object':if(targ.is||targ.style)toff=(targ=$(targ)).offset()}var e=$.isFunction(h.offset)&&h.offset(d,targ)||h.offset;$.each(h.axis.split(''),function(i,a){var b=a=='x'?'Left':'Top',pos=b.toLowerCase(),key='scroll'+b,old=d[key],max=j.max(d,a);if(toff){attr[key]=toff[pos]+(win?0:old-$elem.offset()[pos]);if(h.margin){attr[key]-=parseInt(targ.css('margin'+b))||0;attr[key]-=parseInt(targ.css('border'+b+'Width'))||0}attr[key]+=e[pos]||0;if(h.over[pos])attr[key]+=targ[a=='x'?'width':'height']()*h.over[pos]}else{var c=targ[pos];attr[key]=c.slice&&c.slice(-1)=='%'?parseFloat(c)/100*max:c}if(h.limit&&/^\d+$/.test(attr[key]))attr[key]=attr[key]<=0?0:Math.min(attr[key],max);if(!i&&h.queue){if(old!=attr[key])animate(h.onAfterFirst);delete attr[key]}});animate(h.onAfter);function animate(a){$elem.animate(attr,g,h.easing,a&&function(){a.call(this,targ,h)})}}).end()};j.max=function(a,b){var c=b=='x'?'Width':'Height',scroll='scroll'+c;if(!$(a).is('html,body'))return a[scroll]-$(a)[c.toLowerCase()]();var d='client'+c,html=a.ownerDocument.documentElement,body=a.ownerDocument.body;return Math.max(html[scroll],body[scroll])-Math.min(html[d],body[d])};function both(a){return $.isFunction(a)||typeof a=='object'?a:{top:a,left:a}};return j};
 
-},{"./../bower_components/jquery/dist/jquery.js":6}],24:[function(require,module,exports){
+},{"./../bower_components/jquery/dist/jquery.js":6}],25:[function(require,module,exports){
 "use strict";
 /*globals Handlebars: true */
 var base = require("./handlebars/base");
@@ -11327,7 +11347,7 @@ var Handlebars = create();
 Handlebars.create = create;
 
 exports["default"] = Handlebars;
-},{"./handlebars/base":25,"./handlebars/exception":26,"./handlebars/runtime":27,"./handlebars/safe-string":28,"./handlebars/utils":29}],25:[function(require,module,exports){
+},{"./handlebars/base":26,"./handlebars/exception":27,"./handlebars/runtime":28,"./handlebars/safe-string":29,"./handlebars/utils":30}],26:[function(require,module,exports){
 "use strict";
 var Utils = require("./utils");
 var Exception = require("./exception")["default"];
@@ -11508,7 +11528,7 @@ exports.log = log;var createFrame = function(object) {
   return obj;
 };
 exports.createFrame = createFrame;
-},{"./exception":26,"./utils":29}],26:[function(require,module,exports){
+},{"./exception":27,"./utils":30}],27:[function(require,module,exports){
 "use strict";
 
 var errorProps = ['description', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
@@ -11537,7 +11557,7 @@ function Exception(message, node) {
 Exception.prototype = new Error();
 
 exports["default"] = Exception;
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 var Utils = require("./utils");
 var Exception = require("./exception")["default"];
@@ -11675,7 +11695,7 @@ exports.program = program;function invokePartial(partial, name, context, helpers
 exports.invokePartial = invokePartial;function noop() { return ""; }
 
 exports.noop = noop;
-},{"./base":25,"./exception":26,"./utils":29}],28:[function(require,module,exports){
+},{"./base":26,"./exception":27,"./utils":30}],29:[function(require,module,exports){
 "use strict";
 // Build out our basic SafeString type
 function SafeString(string) {
@@ -11687,7 +11707,7 @@ SafeString.prototype.toString = function() {
 };
 
 exports["default"] = SafeString;
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 /*jshint -W004 */
 var SafeString = require("./safe-string")["default"];
@@ -11764,12 +11784,12 @@ exports.escapeExpression = escapeExpression;function isEmpty(value) {
 }
 
 exports.isEmpty = isEmpty;
-},{"./safe-string":28}],30:[function(require,module,exports){
+},{"./safe-string":29}],31:[function(require,module,exports){
 // Create a simple path alias to allow browserify to resolve
 // the runtime on a supported path.
 module.exports = require('./dist/cjs/handlebars.runtime');
 
-},{"./dist/cjs/handlebars.runtime":24}],31:[function(require,module,exports){
+},{"./dist/cjs/handlebars.runtime":25}],32:[function(require,module,exports){
 module.exports = require("handlebars/runtime")["default"];
 
-},{"handlebars/runtime":30}]},{},[1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,22])
+},{"handlebars/runtime":31}]},{},[1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,23])

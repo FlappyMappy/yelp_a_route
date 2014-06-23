@@ -13,7 +13,7 @@
 
 module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 
-	var service = new google.maps.places.PlacesService(map);
+	var placesService = new google.maps.places.PlacesService(map);
 
 	var reqArr = [];
 
@@ -21,40 +21,19 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 
 	for (i=0; i<bboxArray.length; i++) {
 
-		var req = getReqFunction(bboxArray[i]);
+		//create shallow copy of options
+		//and add bounds property
+		var reqOptions = {};
+
+		for (var key in options){
+			reqOptions[key] = options[key];
+		}
+		reqOptions.bounds = bboxArray[i];
+
+		var req = getReqFunction(reqOptions, placesService);
 
 		reqArr.push(req);
 	}
-
-
-	function getReqFunction (bbox) {
-		return (function() {
-			var reqOptions = {
-				types: options.types,
-				keyword: options.keyword,
-				openNow: options.openNow,
-				minPriceLevel: options.minPriceLevel,
-				maxPriceLevel: options.maxPriceLevel
-			};
-
-			reqOptions.bounds = bbox;
-
-			return function(callback) {
-
-				service.nearbySearch(reqOptions, function(result, status, pagination) {
-
-					if (status == google.maps.places.PlacesServiceStatus.OK){
-
-						callback(result, pagination, map);
-
-					} else {
-
-						throw("BBox to Places request failed:" + status);
-					}
-				});
-			};
-		})();
-	}
-
+	
 	return reqArr;
 };
