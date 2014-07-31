@@ -19,6 +19,7 @@ body
   margin: 0px;
   padding: 0px;
   cursor: default;
+  overflow: auto;
   }
 
 header.top-bar
@@ -74,13 +75,25 @@ div.zoom-map
 
 div.popup-search
   {
+  position: absolute;
+  left: 0;
+  right: 425px;
+  top: 90px;
   margin: auto;
   width: 400px;
-  height: 400px;
   border-radius: 10px;
   box-shadow: 6px 6px 5px rgba(0, 0, 0, .5);
   padding: 10px;
   z-index: 30;
+  }
+
+.group:after /*This is clearfix*/
+  {
+  visibility: hidden;
+  display: block;
+  content: "";
+  clear: both;
+  height: 0;
   }
 
 #list-box
@@ -141,7 +154,6 @@ div.popup-search
     }
   }
 
-
 .options-panel
   {
   margin: 15px;
@@ -152,6 +164,7 @@ div.popup-search
   height: 220px;
   border-radius: 10px;
   padding: 10px;
+  padding-bottom: 20px;
   }
 
 .letter
@@ -159,34 +172,31 @@ div.popup-search
   color: black;
   font-weight: bold;
   font-size: 18pt;
-  padding: 5px;
-  padding-left: 10px;
-  padding-right: 10px;
-  float: left;
+  text-align: center;
+  width: 30px;
   border-radius: 20px;
   margin: 5px;
   box-shadow: 5px 5px 5px rgba(0, 0, 0, .5);
   }
 
-div.inputs
+table.inputs
   {
-  float: left;
   margin: 10px;
   }
 
 div #route-button-wrapper
   {
   padding-top: 10px;
-  padding-left: 20px;
   }
 
 #route-button
   {
+  float: right;
   color: black;
+  margin-right: 15px;
   text-align: center;
   font-size: 20pt;
   font-weight: bold;
-  float: left;
   border-radius: 10px;
   border: none;
   width: 110px;
@@ -212,13 +222,6 @@ input#keyword
 
 div#left-options-box
   {
-  float: left;
-  width: 150px;
-  }
-
-div#right-options-box
-  {
-  float: right;
   width: 150px;
   }
 

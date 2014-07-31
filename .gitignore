@@ -27,3 +27,5 @@ node_modules
 app/bower_components
 https
 test/front-end/test-suite.js
+wireframes
+test/front-end/acceptance/casper-results.xml
