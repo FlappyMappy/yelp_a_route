@@ -10,6 +10,7 @@
 //Params options - options object for locations search
 //Params map - google.maps.Map object
 
+var getReqFunction = require("./getReqFunction");
 
 module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 
@@ -34,6 +35,6 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 
 		reqArr.push(req);
 	}
-	
+
 	return reqArr;
 };

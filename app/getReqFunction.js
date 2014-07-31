@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function getReqFunction (reqOptions, placesService) {
+module.exports = function getReqFunction (reqOptions, service) {
 
     return function(callback) {
 
@@ -16,4 +16,4 @@ module.exports = function getReqFunction (reqOptions, placesService) {
             }
         });
     };
-}
+};

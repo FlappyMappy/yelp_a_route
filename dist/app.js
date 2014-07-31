@@ -266,10 +266,11 @@ google.maps.event.addDomListener(window,'load',function() {
 //Params options - options object for locations search
 //Params map - google.maps.Map object
 
+var getReqFunction = require("./getReqFunction");
 
 module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 
-	var service = new google.maps.places.PlacesService(map);
+	var placesService = new google.maps.places.PlacesService(map);
 
 	var reqArr = [];
 
@@ -286,36 +287,15 @@ module.exports = function bboxToPlacesReqArr(bboxArray, options, map){
 		}
 		reqOptions.bounds = bboxArray[i];
 
-		var req = getReqFunction(reqOptions);
+		var req = getReqFunction(reqOptions, placesService);
 
 		reqArr.push(req);
 	}
 
 	return reqArr;
-
-
-	function getReqFunction (reqOptions) {
-
-		return function(callback) {
-
-			service.nearbySearch(reqOptions, function(result, status, pagination) {
-
-				if (status == google.maps.places.PlacesServiceStatus.OK){
-
-					callback(result, pagination);
-
-				} else {
-
-					throw("BBox to Places request failed:" + status);
-				}
-			});
-		};
-	}
-
-
 };
 
-},{}],6:[function(require,module,exports){
+},{"./getReqFunction":11}],6:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.1
  * http://jquery.com/
@@ -10924,6 +10904,25 @@ module.exports = function executePlacesReqArr(reqArr, callback){
 	makeReq();
 };
 },{}],11:[function(require,module,exports){
+'use strict';
+
+module.exports = function getReqFunction (reqOptions, service) {
+
+    return function(callback) {
+
+        service.nearbySearch(reqOptions, function(result, status, pagination) {
+
+            if (status == google.maps.places.PlacesServiceStatus.OK){
+
+                callback(result, pagination);
+
+            } else {
+
+                throw("BBox to Places request failed:" + status);
+            }
+        });
+    };
+};
 
 },{}],12:[function(require,module,exports){
 //method to convert from miles to meters.
